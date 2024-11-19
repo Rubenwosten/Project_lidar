@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import tqdm
 import numpy as np
 import re
+import Cell
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
