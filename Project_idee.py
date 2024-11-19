@@ -56,7 +56,7 @@ def ego_pos(lidar_samples):
         i += 1
     return ego_trans
     
-# This function determines the minimal and maximal values of the 
+# This function determines the minimal and maximal values of box you want
 def minmax (x,y):
     x_min = np.min(x) - 50
     x_max = np.max(x) + 50
@@ -64,18 +64,26 @@ def minmax (x,y):
     y_max = np.max(y) + 50
     return x_min, x_max, y_min, y_max
 
+# This function makes the sample grid out of the minimal and maximal values 
+# returns a 2d numpy array and a array for each axes
 def grid(x_min, x_max , y_min, y_max):
    
     x_grid = (x_max - x_min)*10
     y_grid = (y_max - y_min)*10
     xarray = np.linspace(x_min, x_max, x_grid)
     yarray = np.linspace(y_min, y_max, y_grid)
-    grid = np.empty((x_grid,y_grid))
+    
+    grid = [[Cell(x, y) for y in range(y_grid)] for x in range(x_grid)]
+    
     return grid, xarray, yarray
 
+# This function determines the risk for each grid cell
 def risk():
     return
 
+# This function determines what grid cells are of interest with respect to the ego position
+# This returns a 2d numpy array that is of size(r,r) with the grid cells in the circle having a value of 1 
+# and the grid cells outside of the circle having a value of 0
 def circle_of_interrest(r):
     circle = np.zeros((2*r+1,2*r+1))
     for i in range(2*r+1):
@@ -97,6 +105,8 @@ def circle_of_interrest(r):
             i+=1
     return circle
 
+# This function changes the occurance values after each timestep
+# returns the new occurance grid
 def occurnence(occ, is_gescand, x, y, r,x_range,y_range ):
     occur = occ
     i = 0
@@ -168,4 +178,10 @@ x = ego_position[0][0]
 y = ego_position[0][1]
 
 patch = ((x-10),(y-10),(x+10),(y+10))
+
+
+
+
+specific_cell = grid[1][2]
+cell_occ = specific_cell.occ
 
