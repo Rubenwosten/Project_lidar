@@ -7,7 +7,7 @@ from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
-
+ 
 nusc = NuScenes(version='v1.0-mini', verbose=False)
 
 nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/v1.0-mini', map_name='singapore-onenorth')
@@ -26,6 +26,9 @@ map_height = 2118.1
 scene = nusc.scene[1]
 first = scene['first_sample_token']
 last = scene['last_sample_token']
+
+# This function loads in each sample in the the scene
+# returns a numpy array of the samples and a numpy array of the lidar sample
 def samples_scene(first,last):
     samples = np.empty(0)
     lidar_sample = np.empty(0)
@@ -41,6 +44,8 @@ def samples_scene(first,last):
     lidar_sample = np.append(lidar_sample, info_last['data']['LIDAR_TOP'])
     return samples,lidar_sample
 
+# This function determines the path of the ego vehicle
+# returns a numpy array of the ego vehicles position
 def ego_pos(lidar_samples):
     ego_trans = np.empty((40,3))
     i = 0
@@ -51,6 +56,7 @@ def ego_pos(lidar_samples):
         i += 1
     return ego_trans
     
+# This function determines the minimal and maximal values of the 
 def minmax (x,y):
     x_min = np.min(x) - 50
     x_max = np.max(x) + 50
@@ -69,6 +75,7 @@ def grid(x_min, x_max , y_min, y_max):
 
 def risk():
     return
+
 def circle_of_interrest(r):
     circle = np.zeros((2*r+1,2*r+1))
     for i in range(2*r+1):
@@ -89,6 +96,7 @@ def circle_of_interrest(r):
             circle[i]=circle[i]
             i+=1
     return circle
+
 def occurnence(occ, is_gescand, x, y, r,x_range,y_range ):
     occur = occ
     i = 0
@@ -109,6 +117,7 @@ def occurnence(occ, is_gescand, x, y, r,x_range,y_range ):
             j+=1
         i+=1        
     return occur
+
 def map_interrest(grid, x_range, y_range):
     map_int = grid
     i = 0
@@ -124,6 +133,7 @@ def map_interrest(grid, x_range, y_range):
             j+=1
         i+=1
     return map_int
+
 def gescand(occ, circle, x, y, r, x_range, y_range):
     is_gescand = np.zeros((2*r+1,2*r+1))
     i = 0
@@ -139,8 +149,10 @@ def gescand(occ, circle, x, y, r, x_range, y_range):
             j += 1
         i+=1
     return is_gescand
+
 def static():
     return
+
 def dynamic():
     return
 
