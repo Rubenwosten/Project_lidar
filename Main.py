@@ -5,39 +5,41 @@ import tqdm
 import numpy as np
 import re
 import Cell
-import Grid
-import Map
+from Grid import Grid 
+from Map import Map
 import Visualise
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
- 
-nusc = NuScenes(version='v1.0-mini', verbose=False)
 
-nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/v1.0-mini', map_name='singapore-onenorth')
-bitmap = BitMap(nusc_map.dataroot, nusc_map.map_name, 'basemap')
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+map_name = 'singapore-onenorth'
 
 
 map_width = 2979.5
 map_height = 2118.1
-#sample array
-scene = nusc.scene[1]
-first = scene['first_sample_token']
-last = scene['last_sample_token']
 
+map = Map(dataroot, map_name, map_width, map_height)
 
-LIDAR_RANGE = 50 # meter
+scene, first, last = map.get_scene(1)
 
-samples,lidar_samples = Map.samples_scene(first, last)
-ego_position = ego_pos(lidar_samples)
+LIDAR_RANGE = 5 # 50 meter
+RESOLUTION = 0.1 # meter
+
+samples,lidar_samples = map.samples_scene(first, last)
+ego_position = map.ego_pos(lidar_samples)
 
 x = ego_position[0][0]
 y = ego_position[0][1]
 
 patch = ((x-10),(y-10),(x+10),(y+10))
 
-grid = Grid(Map.minmax(x,y, LIDAR_RANGE))
-Map.assign_layer(grid)
+
+x_min, x_max, y_min, y_max = map.minmax(x,y, LIDAR_RANGE)
+grid = Grid(x_min, x_max, y_min, y_max, RESOLUTION)
+map.assign_layer(grid)
 Visualise.show_grid(grid)
+
+print('Done')
