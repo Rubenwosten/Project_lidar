@@ -11,8 +11,14 @@ class Grid:
         self.xarray = np.linspace(x_min, x_max, self.width)
         self.yarray = np.linspace(y_min, y_max, self.length)
         
-        self.grid = [[Cell(x, y) for y in range(self.length)] for x in range(self.width)]
+        self.grid = [[Cell(self.xarray[x], self.yarray[y]) for y in range(self.length)] for x in range(self.width)]
 
-        print('grid of width {} and length {} was created'.format(self.width, self.length))
+        self.has_assigned_layers = False
+        print('grid of width {} and length {} was created with {} elements'.format(self.width, self.length, self.width * self.length))
         
+    def get_layer_matrix(self):
+        """
+        Returns a 2D matrix of layer values for visualization.
+        """
+        return [[cell.layer for cell in row] for row in self.grid]
         

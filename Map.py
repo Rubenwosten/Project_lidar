@@ -64,6 +64,14 @@ class Map:
         y_min = np.min(y) - range
         y_max = np.max(y) + range
         return x_min, x_max, y_min, y_max
+    
+        # This function determines the minimal and maximal values of box you want
+    def minmax_ego (self, ego, range):
+        x_min = np.min(ego[:][0]) - range
+        x_max = np.max(ego[:][0]) + range
+        y_min = np.min(ego[:][1]) - range
+        y_max = np.max(ego[:][1]) + range
+        return x_min, x_max, y_min, y_max
 
 
     # This function changes the occurance values after each timestep
@@ -148,15 +156,25 @@ class Map:
             i+=1
         return map_int
 
-    def assign_layer(self, grid):
-        print('assigning layers to the grid')
-        start_time = time.time()
-        for i, x in enumerate(grid.xarray):
-            print('assigning for i = {} and x = {} at time = {}'.format(i, x, time.time() - start_time))
-            for j, y in enumerate(grid.yarray):
-                grid.grid[i][j].layer = self.nusc_map.layers_on_point(x,y)
-        
-        print('grid layers were assigned')
-        return 
+    def assign_layer(self, grid, prnt = False):
+        if (grid.has_assigned_layers == False):
+            elements = grid.width * grid.length
+            time_per_element = 0.218583
+            print('assigning layers to the grid with {} elements'.format(elements))
+            print('estimated time till completion = {} seconds'.format(elements * time_per_element))
+
+            start_time = time.time()
+            for i, x in enumerate(grid.xarray):
+                if(prnt):
+                    print('assigning for i = {} and x = {} at time = {}'.format(i, x, time.time() - start_time))
+                for j, y in enumerate(grid.yarray):
+                    grid.grid[i][j].layers = self.nusc_map.layers_on_point(x,y)
+                    grid.grid[i][j].assign_layer()
+            grid.has_assigned_layers = True
+
+            print('time per element = {}'.format(elements / (time.time() - start_time)))
+            print('grid layers were assigned')
+        else:
+            print('grid already has assigned layers')
 
 

@@ -1,19 +1,20 @@
 # This class handles the risk function(s)
+class Risk:
 
-def CalcRisk():
-    StaticRisk()
-    DetectionRisk()
-    TrackingRisk()
-    return
+    def CalcRisk(self):
+        self.StaticRisk(self)
+        self.DetectionRisk(self)
+        self.TrackingRisk(self)
+        return
 
-def StaticRisk():
-    return
+    def StaticRisk(self):
+        return
 
-def DetectionRisk():
-    return
+    def DetectionRisk(self):
+        return
 
-def TrackingRisk():
-    return
+    def TrackingRisk(self):
+        return
 
 
 

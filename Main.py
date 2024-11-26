@@ -7,7 +7,7 @@ import re
 import Cell
 from Grid import Grid 
 from Map import Map
-import Visualise
+from Visualise import Visualise
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
@@ -23,23 +23,26 @@ map_height = 2118.1
 
 map = Map(dataroot, map_name, map_width, map_height)
 
+# print("All layer names are: {}".format(map.nusc_map.layer_names))
+
 scene, first, last = map.get_scene(1)
 
-LIDAR_RANGE = 5 # 50 meter
-RESOLUTION = 0.1 # meter
+LIDAR_RANGE = 8 # 50 meter
+RESOLUTION = 0.5 # meter
 
 samples,lidar_samples = map.samples_scene(first, last)
 ego_position = map.ego_pos(lidar_samples)
 
-x = ego_position[0][0]
-y = ego_position[0][1]
+x = 360 # ego_position[0][0]
+y = 1112 # ego_position[0][1]
 
 patch = ((x-10),(y-10),(x+10),(y+10))
 
 
 x_min, x_max, y_min, y_max = map.minmax(x,y, LIDAR_RANGE)
 grid = Grid(x_min, x_max, y_min, y_max, RESOLUTION)
-map.assign_layer(grid)
-Visualise.show_grid(grid)
+map.assign_layer(grid, prnt = True)
+
+Visualise.plot_grid(grid)
 
 print('Done')
