@@ -23,11 +23,9 @@ map_height = 2118.1
 
 map = Map(dataroot, map_name, map_width, map_height)
 
-# print("All layer names are: {}".format(map.nusc_map.layer_names))
-
 scene, first, last = map.get_scene(1)
 
-LIDAR_RANGE = 8 # 50 meter
+LIDAR_RANGE = 10 # 50 meter
 RESOLUTION = 0.5 # meter
 
 samples,lidar_samples = map.samples_scene(first, last)

@@ -169,10 +169,10 @@ class Map:
                     print('assigning for i = {} and x = {} at time = {}'.format(i, x, time.time() - start_time))
                 for j, y in enumerate(grid.yarray):
                     grid.grid[i][j].layers = self.nusc_map.layers_on_point(x,y)
-                    grid.grid[i][j].assign_layer()
+                    grid.grid[i][j].assign_layer(prnt = False)
             grid.has_assigned_layers = True
 
-            print('time per element = {}'.format(elements / (time.time() - start_time)))
+            print('elements per second = {}'.format(elements / (time.time() - start_time)))
             print('grid layers were assigned')
         else:
             print('grid already has assigned layers')
