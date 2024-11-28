@@ -3,6 +3,7 @@ import numpy as np
 import time
 from tqdm import tqdm
 import Grid
+import pickle
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
@@ -11,20 +12,31 @@ from nuscenes.map_expansion.bitmap import BitMap
 
 class Map:
 
-    def __init__(self, dataroot, map_name, map_width, map_height, ego, RANGE, RES) -> None:
-        
+    def __init__(self, dataroot, map_name, map_width, map_height, scene_id, RANGE, RES) -> None:
+        # get the correct nuscenes object
         self.nusc = NuScenes(version='v1.0-mini', dataroot=dataroot, verbose=False)
 
         self.nusc_map = NuScenesMap(dataroot=dataroot, map_name=map_name)
         self.bitmap = BitMap(self.nusc_map.dataroot, self.nusc_map.map_name, 'basemap')
 
+        # save the width and height of the map
         self.map_width = map_width
         self.map_height = map_height
 
-        self.patch = self.get_patch(self, ego, RANGE)
+        # get the specific scene based on the scene id 
+        self.scene, first, last = self.get_scene(scene_id)
 
+        # get the ego positions of the car for all samples of the scene
+        self.samples,lidar_samples = self.samples_scene(first, last)
+        self.ego_position = self.ego_pos(lidar_samples)
+
+        # make a patch based on the min and max of the coordinates plus the range of the lidar
+        self.patch = self.get_patch(self, self.ego_position, RANGE)
+
+        # initialise a cell grid 
         self.grid = Grid(self.patch, RES)
 
+        # get all records within your map
         self.rec = self.get_records_in_patch(self.patch)
 
 
@@ -65,21 +77,6 @@ class Map:
             i += 1
         return ego_trans
         
-    # This function determines the minimal and maximal values of box you want
-    def minmax (self, x,y, range):
-        x_min = np.min(x) - range
-        x_max = np.max(x) + range
-        y_min = np.min(y) - range
-        y_max = np.max(y) + range
-        return x_min, x_max, y_min, y_max
-    
-        # This function determines the minimal and maximal values of box you want
-    def minmax_ego (self, ego, range):
-        x_min = np.min(ego[:][0]) - range
-        x_max = np.max(ego[:][0]) + range
-        y_min = np.min(ego[:][1]) - range
-        y_max = np.max(ego[:][1]) + range
-        return x_min, x_max, y_min, y_max
 
     def get_patch(self, ego, range):
         x_min = np.min(ego[:][0]) - range
@@ -170,6 +167,7 @@ class Map:
             i+=1
         return map_int
 
+    # this function assigns the layers variable of each cell based on the records within the map
     def assign_layer(self, prnt = False):
         if (self.grid.has_assigned_layers == False):
             elements = self.grid.width * self.grid.length
@@ -188,9 +186,11 @@ class Map:
 
             print('elements per second = {}'.format(elements / (time.time() - start_time)))
             print('grid layers were assigned')
+            self.save_grid()
         else:
             print('grid already has assigned layers')
 
+    # this function getsall the records within the patch of the map
     def get_records_in_patch(self, patch):
         # my_patch = (300, 1000, 500, 1200)
         records_within_patch = self.nusc_map.get_records_in_patch(patch, self.nusc_map.non_geometric_layers, mode='intersect')
@@ -204,5 +204,17 @@ class Map:
                 rec[layer][record] = info
         return rec
     
+    # Save the grid object
+    def save_grid(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self.grid.to_dict(), f)  # Save the grid's dictionary representation
+
+    # Load the grid object
+    def load_grid(self, filename):
+        with open(filename, 'rb') as f:
+            grid_dict = pickle.load(f)  # Load the dictionary from the file
+            self.grid = Grid.from_dict(grid_dict)
+            return self.grid # Reconstruct the grid from the dictionary
+
     
 

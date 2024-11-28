@@ -39,6 +39,38 @@ class Cell:
         if(prnt):
             print('The new self.layer variable = {}'.format(self.layer))
 
+    def to_dict(self):
+        """
+        Convert the Cell object into a dictionary for saving.
+        """
+        return {
+            'x': self.x,
+            'y': self.y,
+            'occ': self.occ,
+            'risk': self.risk,
+            'layers': self.layers,
+            'layer': self.layer,
+            'isscanned': self.isscanned,
+            'ofinterest': self.ofinterest
+        }
+
+    @staticmethod
+    def from_dict(cell_dict):
+        """
+        Convert a dictionary back into a Cell object.
+        """
+        cell = Cell(
+            x=cell_dict['x'],
+            y=cell_dict['y'],
+            occ=cell_dict['occ'],
+            risk=cell_dict['risk'],
+            layers=cell_dict['layers']
+        )
+        cell.layer = cell_dict['layer']
+        cell.isscanned = cell_dict['isscanned']
+        cell.ofinterest = cell_dict['ofinterest']
+        return cell
+
 
 
 

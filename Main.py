@@ -8,6 +8,7 @@ import Cell
 from Grid import Grid 
 from Map import Map
 from Visualise import Visualise
+from Risk import Risk
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
@@ -27,15 +28,14 @@ x = 360 # ego_position[0][0]
 y = 1112 # ego_position[0][1]
 ego = (x, y)
 
-map = Map(dataroot, map_name, map_width, map_height, ego, LIDAR_RANGE, RESOLUTION)
+scene_id = 1
 
-scene, first, last = map.get_scene(1)
-
-
-samples,lidar_samples = map.samples_scene(first, last)
-ego_position = map.ego_pos(lidar_samples)
+map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
 map.assign_layer(prnt = False)
+
+for sample in map.samples:
+    Risk.CalcRisk()
 
 Visualise.plot_grid(map.grid)
 
