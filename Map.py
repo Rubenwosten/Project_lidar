@@ -1,6 +1,7 @@
 
 import numpy as np
 import time
+from tqdm import tqdm
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
@@ -159,12 +160,12 @@ class Map:
     def assign_layer(self, grid, prnt = False):
         if (grid.has_assigned_layers == False):
             elements = grid.width * grid.length
-            time_per_element = 0.218583
+            time_per_element = 1 / 7.158059251767507 
             print('assigning layers to the grid with {} elements'.format(elements))
             print('estimated time till completion = {} seconds'.format(elements * time_per_element))
 
             start_time = time.time()
-            for i, x in enumerate(grid.xarray):
+            for i, x in enumerate(tqdm(grid.xarray)):
                 if(prnt):
                     print('assigning for i = {} and x = {} at time = {}'.format(i, x, time.time() - start_time))
                 for j, y in enumerate(grid.yarray):

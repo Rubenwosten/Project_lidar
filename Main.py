@@ -1,7 +1,7 @@
 # This is the file that executes all the code
 
 import matplotlib.pyplot as plt
-import tqdm
+from tqdm import tqdm
 import numpy as np
 import re
 import Cell
@@ -39,7 +39,7 @@ patch = ((x-10),(y-10),(x+10),(y+10))
 
 x_min, x_max, y_min, y_max = map.minmax(x,y, LIDAR_RANGE)
 grid = Grid(x_min, x_max, y_min, y_max, RESOLUTION)
-map.assign_layer(grid, prnt = True)
+map.assign_layer(grid, prnt = False)
 
 Visualise.plot_grid(grid)
 
