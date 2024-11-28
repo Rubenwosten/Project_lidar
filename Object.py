@@ -38,6 +38,8 @@ class Object:
         self.mtp_input_representation = InputRepresentation(self.static_layer_rasterizer, self.agent_rasterizer, Rasterizer())
         self.backbone = ResNetBackbone('resnet50')
         self.mtp = MTP(self.backbone, num_modes=6)
+        self.voorspell = self.voorspelling()
+        
         
     def voorspelling(self):
         img = self.mtp_input_representation.make_input_representation(self.objecttoken,self.sampletoken)
@@ -47,3 +49,4 @@ class Object:
         image_tensor = torch.Tensor(img).permute(2, 0, 1).unsqueeze(0)
         voorspelling = self.mtp(image_tensor, agent_state_vector)
         return voorspelling
+    
