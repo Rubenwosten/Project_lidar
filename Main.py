@@ -15,7 +15,7 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-LIDAR_RANGE = 50 # 50 meter
+LIDAR_RANGE = 5 # 50 meter
 RESOLUTION = 1 # meter
 
 dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'

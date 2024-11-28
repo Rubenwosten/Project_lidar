@@ -14,7 +14,7 @@ class Risk:
         if not hasattr(self, "initialized"):  # Prevent re-initialization
             self.initialized = True
 
-
+    
     def CalcRisk(self):
         self.StaticRisk(self)
         self.DetectionRisk(self)

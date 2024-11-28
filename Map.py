@@ -2,7 +2,7 @@
 import numpy as np
 import time
 from tqdm import tqdm
-import Grid
+from Grid import Grid
 import pickle
 
 from nuscenes.nuscenes import NuScenes
@@ -31,7 +31,10 @@ class Map:
         self.ego_position = self.ego_pos(lidar_samples)
 
         # make a patch based on the min and max of the coordinates plus the range of the lidar
-        self.patch = self.get_patch(self, self.ego_position, RANGE)
+        self.patch = self.get_patch(self.ego_position, RANGE)
+        print('patch = {}'.format(self.patch))
+
+        #TODO add a bit of code that checks if the grid is saved, if so load up the grid
 
         # initialise a cell grid 
         self.grid = Grid(self.patch, RES)
@@ -77,12 +80,18 @@ class Map:
             i += 1
         return ego_trans
         
+    def minmax(self, x, y, range):
+        x_min = np.min(x) - range
+        x_max = np.max(x) + range
+        y_min = np.min(y) - range
+        y_max = np.max(y) + range
+        return (x_min, x_max, y_min, y_max)
 
     def get_patch(self, ego, range):
-        x_min = np.min(ego[:][0]) - range
-        x_max = np.max(ego[:][0]) + range
-        y_min = np.min(ego[:][1]) - range
-        y_max = np.max(ego[:][1]) + range
+        x_min = np.min(ego[:,0]) - range
+        x_max = np.max(ego[:,0]) + range
+        y_min = np.min(ego[:,1]) - range
+        y_max = np.max(ego[:,1]) + range
         return (x_min, x_max, y_min, y_max)
 
     # This function changes the occurance values after each timestep
