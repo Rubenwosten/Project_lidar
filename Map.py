@@ -2,6 +2,7 @@
 import numpy as np
 import time
 from tqdm import tqdm
+import Grid
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
@@ -10,7 +11,7 @@ from nuscenes.map_expansion.bitmap import BitMap
 
 class Map:
 
-    def __init__(self, dataroot, map_name, map_width, map_height) -> None:
+    def __init__(self, dataroot, map_name, map_width, map_height, ego, RANGE, RES) -> None:
         
         self.nusc = NuScenes(version='v1.0-mini', dataroot=dataroot, verbose=False)
 
@@ -19,6 +20,12 @@ class Map:
 
         self.map_width = map_width
         self.map_height = map_height
+
+        self.patch = self.get_patch(self, ego, RANGE)
+
+        self.grid = Grid(self.patch, RES)
+
+        self.rec = self.get_records_in_patch(self.patch)
 
 
     def get_scene(self, index):
@@ -74,6 +81,12 @@ class Map:
         y_max = np.max(ego[:][1]) + range
         return x_min, x_max, y_min, y_max
 
+    def get_patch(self, ego, range):
+        x_min = np.min(ego[:][0]) - range
+        x_max = np.max(ego[:][0]) + range
+        y_min = np.min(ego[:][1]) - range
+        y_max = np.max(ego[:][1]) + range
+        return (x_min, x_max, y_min, y_max)
 
     # This function changes the occurance values after each timestep
     # returns the new occurance grid
@@ -157,25 +170,39 @@ class Map:
             i+=1
         return map_int
 
-    def assign_layer(self, grid, prnt = False):
-        if (grid.has_assigned_layers == False):
-            elements = grid.width * grid.length
-            time_per_element = 1 / 7.158059251767507 
+    def assign_layer(self, prnt = False):
+        if (self.grid.has_assigned_layers == False):
+            elements = self.grid.width * self.grid.length
+            time_per_element = 1 / 22.72795127375305
             print('assigning layers to the grid with {} elements'.format(elements))
             print('estimated time till completion = {} seconds'.format(elements * time_per_element))
 
             start_time = time.time()
-            for i, x in enumerate(tqdm(grid.xarray)):
+            for i, x in enumerate(tqdm(self.grid.xarray)):
                 if(prnt):
                     print('assigning for i = {} and x = {} at time = {}'.format(i, x, time.time() - start_time))
-                for j, y in enumerate(grid.yarray):
-                    grid.grid[i][j].layers = self.nusc_map.layers_on_point(x,y)
-                    grid.grid[i][j].assign_layer(prnt = False)
-            grid.has_assigned_layers = True
+                for j, y in enumerate(self.grid.yarray):
+                    self.grid.grid[i][j].layers = self.nusc_map.layers_on_point_v2(x, y, self.rec)
+                    self.grid.grid[i][j].assign_layer(prnt = False)
+            self.grid.has_assigned_layers = True
 
             print('elements per second = {}'.format(elements / (time.time() - start_time)))
             print('grid layers were assigned')
         else:
             print('grid already has assigned layers')
 
+    def get_records_in_patch(self, patch):
+        # my_patch = (300, 1000, 500, 1200)
+        records_within_patch = self.nusc_map.get_records_in_patch(patch, self.nusc_map.non_geometric_layers, mode='intersect')
+        rec = {}
+        layer_names=['drivable_area', 'road_segment', 'road_block', 'lane', 'ped_crossing', 'walkway', 'stop_line', 'carpark_area']
+
+        for layer in layer_names:
+            rec[layer] = {}
+            for record in records_within_patch[layer]:
+                info = self.nusc_map.get(layer, record)
+                rec[layer][record] = info
+        return rec
+    
+    
 
