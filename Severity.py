@@ -1,5 +1,7 @@
-# this class designates a severity function according to identified objects and their orientation
+from Object import Object
 
+
+# this class designates a severity function according to identified objects and their orientation
 class severity:
     traffic_participant_f = {
     "human.pedestrian.adult": {
