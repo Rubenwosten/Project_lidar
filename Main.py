@@ -15,8 +15,10 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-LIDAR_RANGE = 5 # 50 meter
-RESOLUTION = 1 # meter
+LIDAR_RANGE = 50 # 50 meter
+RESOLUTION = 0.5 # meter
+
+risk_weights = (1, 1, 1) 
 
 dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 map_name = 'boston-seaport'  #'singapore-onenorth'
@@ -30,16 +32,16 @@ ego = (x, y)
 
 scene_id = 1
 
-filename = 'layer map boston scene 1'
+filename = 'layer map boston scene 1 high res'
 
 map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
-map.assign_layer(prnt = False)
+map.assign_layer(filename, prnt = False)
 
 risk = Risk()
 
 for sample in map.samples:
-    risk.CalcRisk()
+    risk.CalcRisk(map, risk_weights)
 
 Visualise.plot_grid(map.grid)
 

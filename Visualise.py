@@ -30,7 +30,7 @@ class Visualise:
         Visualizes the grid's layer variable as a grid plot.
         :param grid: A Grid object to visualize
         """
-        layer_matrix = grid.get_layer_matrix()
+        layer_matrix = np.transpose(grid.get_layer_matrix())
         if(prnt):
             print("Layer Matrix: \n{}".format(layer_matrix))
         # Flatten the layer_matrix to get the unique layers
@@ -48,7 +48,7 @@ class Visualise:
 
         # Use matplotlib to plot the grid
         plt.figure(figsize=(8, 8))
-        plt.imshow(color_matrix, origin='upper')
+        plt.imshow(color_matrix, origin='lower')
         plt.title("Grid Visualization with Layer Colors")
         plt.legend(handles=legend_handles, loc='upper right')
         #plt.axis("off")  # Turn off axes for better visualization

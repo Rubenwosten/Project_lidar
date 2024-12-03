@@ -1,8 +1,8 @@
 from Visualise import Visualise
 from Map import Map
 
-LIDAR_RANGE = 5 # 50 meter
-RESOLUTION = 1 # meter
+LIDAR_RANGE = 50 # 50 meter
+RESOLUTION = 0.5 # meter
 
 dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 map_name = 'singapore-onenorth'
@@ -18,7 +18,7 @@ scene_id = 1
 
 map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
-filename = 'layer map scene 1'
+filename = 'layer map boston scene 1 high res'
 
 map.load_grid(filename)
 

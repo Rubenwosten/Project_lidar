@@ -3,16 +3,29 @@ class Cell:
 
     priority_layers = ['ped_crossing', 'walkway', 'stop_line', 'lane', 'road_block', 'road_segment', 'drivable_area', 'carpark_area']
     
+    severity_scores = {
+        'ped_crossing': 10,
+        'walkway': 9,
+        'stop_line': 8,
+        'lane': 7,
+        'road_block': 6,
+        'road_segment': 5,
+        'drivable_area': 4,
+        'carpark_area': 3
+    }
 
-    def __init__(self, x, y, occ = 1, risk = 0, layers = None):
+    def __init__(self, x, y,layers = None):
         if layers is None:
             layers = {}
         self.x = x
         self.y = y
-        self.occ = occ
+        self.occ = 0
         self.layers = layers
         self.layer = 'empty'
-        self.risk = risk 
+        self.total_risk = 0 
+        self.static_risk = 0
+        self.detect_risk = 0
+        self.track_risk = 0
         self.isscanned = False
         self.ofinterest = 0
 
@@ -36,8 +49,26 @@ class Cell:
                 self.layer = layer_name
                 break
 
+        # Calculate the static risk as the sum of severity scores for all layers in self.layers
+        self.static_risk = sum(Cell.severity_scores.get(layer, 0) for layer in self.layers)
+
         if(prnt):
             print('The new self.layer variable = {}'.format(self.layer))
+
+    def CalcRisk(self, weights):
+        """
+        Calculate the total risk as a weighted sum of static_risk, detect_risk, and track_risk.
+
+        :param weights: Tuple of three weights (w_static, w_detect, w_track)
+        :return: Total calculated risk
+        """
+        if len(weights) != 3:
+            raise ValueError("Weights must be a tuple of length 3 (w_static, w_detect, w_track).")
+        
+        w_static, w_detect, w_track = weights
+        self.risk = w_static * self.static_risk + w_detect * self.detect_risk + w_track * self.track_risk
+        return self.risk
+
 
     def to_dict(self):
         """
@@ -47,7 +78,10 @@ class Cell:
             'x': self.x,
             'y': self.y,
             'occ': self.occ,
-            'risk': self.risk,
+            'total risk': self.total_risk,
+            'static risk': self.static_risk,
+            'detect risk': self.detect_risk,
+            'track risk': self.track_risk,
             'layers': self.layers,
             'layer': self.layer,
             'isscanned': self.isscanned,
@@ -58,18 +92,28 @@ class Cell:
     def from_dict(cell_dict):
         """
         Convert a dictionary back into a Cell object.
+
+            'total risk': self.total_risk,
+            'static risk': self.static_risk,
+            'detect risk': self.detect_risk,
+            'track risk': self.track_risk,
+
         """
         cell = Cell(
             x=cell_dict['x'],
             y=cell_dict['y'],
-            occ=cell_dict['occ'],
-            risk=cell_dict['risk'],
             layers=cell_dict['layers']
         )
+        cell.occ = cell_dict['occ']
+        cell.total_risk = cell_dict['total risk']
+        cell.static_risk = cell_dict['static risk']
+        cell.detect_risk = cell_dict['detect risk']
+        cell.track_risk = cell_dict['track risk']
         cell.layer = cell_dict['layer']
         cell.isscanned = cell_dict['isscanned']
         cell.ofinterest = cell_dict['ofinterest']
         return cell
+
 
 
 
