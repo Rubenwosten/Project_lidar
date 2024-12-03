@@ -1,6 +1,8 @@
 from nuscenes.nuscenes import NuScenes 
 import matplotlib.pyplot as plt
 import numpy as np
+import math 
+import os
 
 from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
@@ -86,7 +88,7 @@ mtp_input_representation = InputRepresentation(static_layer_rasterizer, agent_ra
 img = mtp_input_representation.make_input_representation(anns[1][1],samples[3])
 
 backbone = ResNetBackbone('resnet50')
-mtp = MTP(backbone, num_modes=6)
+mtp = MTP(backbone, num_modes=5)
 
 agent_state_vector = torch.Tensor([[helper.get_velocity_for_agent(anns[20][1], samples[3]),
                                     helper.get_acceleration_for_agent(anns[20][1], samples[3]),
@@ -96,6 +98,39 @@ agent_state_vector = torch.Tensor([[helper.get_velocity_for_agent(anns[20][1], s
 image_tensor = torch.Tensor(img).permute(2, 0, 1).unsqueeze(0)
 
 route = mtp(image_tensor, agent_state_vector)
-print(route)
-print(layers)
+
+
+def route_splitser(route_tensor, num_of_modes,route_length):
+    route_dim = (num_of_modes*2,route_length/2)
+    route_tensor = route_tensor.flatten()
+    routestensor = route_tensor[:num_of_modes * route_length].view(-1)
+    probabilities_tensor = route_tensor[num_of_modes * route_length:]
+    
+    gespilts = routestensor.view(num_of_modes, 2, -1).permute(1, 2, 0).reshape(int(route_dim[0]), int(route_dim[1])).detach().numpy()
+    prob_logit = probabilities_tensor.detach().numpy()
+    som = 0
+    i = 0
+    for i in range(num_of_modes):
+        som += math.exp(prob_logit[i])
+        i+=1
+    i=0
+    prob = np.empty(num_of_modes)
+    for i in range(num_of_modes):
+        prob[i] = math.exp(prob_logit[i])/som
+        i +=1
+    
+    return gespilts, prob
+
+num = 5
+length = 24
+gespl, prob = route_splitser(route, num, length)
+print(gespl)
+print(prob)
 print(layers_2)
+
+pad = 'C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/v1.0-mini/sweeps/LIDAR_TOP'
+bestand = 'n008-2018-08-01-15-16-36-0400__LIDAR_TOP__1533151603597909.pcd.bin'
+file_path = os.path.join(pad, bestand)
+file = open(file_path)
+cont = file.read(type = float)
+print(cont)
