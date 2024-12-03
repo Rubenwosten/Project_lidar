@@ -16,9 +16,9 @@ class Risk:
 
     
     def CalcRisk(self):
-        self.StaticRisk(self)
-        self.DetectionRisk(self)
-        self.TrackingRisk(self)
+        self.StaticRisk()
+        self.DetectionRisk()
+        self.TrackingRisk()
         return
 
     def StaticRisk(self):

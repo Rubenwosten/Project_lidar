@@ -19,7 +19,7 @@ LIDAR_RANGE = 5 # 50 meter
 RESOLUTION = 1 # meter
 
 dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
-map_name = 'singapore-onenorth'
+map_name = 'boston-seaport'  #'singapore-onenorth'
 
 map_width = 2979.5
 map_height = 2118.1
@@ -30,12 +30,16 @@ ego = (x, y)
 
 scene_id = 1
 
+filename = 'layer map boston scene 1'
+
 map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
 map.assign_layer(prnt = False)
 
+risk = Risk()
+
 for sample in map.samples:
-    Risk.CalcRisk()
+    risk.CalcRisk()
 
 Visualise.plot_grid(map.grid)
 

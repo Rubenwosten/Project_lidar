@@ -177,7 +177,7 @@ class Map:
         return map_int
 
     # this function assigns the layers variable of each cell based on the records within the map
-    def assign_layer(self, prnt = False):
+    def assign_layer(self, filename, prnt = False):
         if (self.grid.has_assigned_layers == False):
             elements = self.grid.width * self.grid.length
             time_per_element = 1 / 22.72795127375305
@@ -195,7 +195,7 @@ class Map:
 
             print('elements per second = {}'.format(elements / (time.time() - start_time)))
             print('grid layers were assigned')
-            self.save_grid()
+            self.save_grid(filename)
         else:
             print('grid already has assigned layers')
 
