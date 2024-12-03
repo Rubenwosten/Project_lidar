@@ -1,8 +1,8 @@
 from Visualise import Visualise
 from Map import Map
 
-LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 0.5 # meter
+LIDAR_RANGE = 5 # 50 meter
+RESOLUTION = 1 # meter
 
 dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 map_name = 'singapore-onenorth'
