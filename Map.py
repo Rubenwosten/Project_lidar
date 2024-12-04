@@ -4,11 +4,25 @@ import time
 from tqdm import tqdm
 from Grid import Grid
 import pickle
+import os
+
+from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExecutor
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
+
+def assign_layer_task(x, nusc_map, rec, grid, prnt=False):
+    """
+    This function processes a single row (x) of the grid and assigns layers to it.
+    """
+    row_results = []
+    for y, _ in enumerate(grid.yarray):  # Process every column in the row
+        layers = nusc_map.layers_on_point_v2(x, y, rec)
+        row_results.append((x, y, layers))  # Append (x, y, layers) for each cell in the row
+    return row_results  # Return results for the entire row
+
 
 class Map:
 
@@ -177,7 +191,7 @@ class Map:
         return map_int
 
     # this function assigns the layers variable of each cell based on the records within the map
-    def assign_layer(self, prnt = False):
+    def assign_layer(self, filename, prnt = False):
         if (self.grid.has_assigned_layers == False):
             elements = self.grid.width * self.grid.length
             time_per_element = 1 / 22.72795127375305
@@ -195,9 +209,56 @@ class Map:
 
             print('elements per second = {}'.format(elements / (time.time() - start_time)))
             print('grid layers were assigned')
-            self.save_grid()
+            self.save_grid(filename)
         else:
             print('grid already has assigned layers')
+
+
+        
+    def assign_layer_parallel(self, filename, prnt=False):
+        if not self.grid.has_assigned_layers:
+            elements = self.grid.width * self.grid.length
+            time_per_element = 1 / 22.72795127375305
+            print(f'Assigning layers to the grid with {elements} elements.')
+            print(f'Estimating time: {elements * time_per_element} seconds')
+
+            start_time = time.time()
+
+            # Limit number of processes to the number of CPU cores (e.g., 4 or 8 cores)
+            num_workers = min(8, os.cpu_count())  # Use a maximum of 8 workers
+
+            # Function to process a single row
+            def process_row(row_index, nusc_map, rec, grid, prnt=False):
+                # Process the row (x = row_index) and return the results for that row
+                return assign_layer_task(row_index, nusc_map, rec, grid, prnt)
+
+            all_results = []
+            with ProcessPoolExecutor(max_workers=num_workers) as executor:
+                futures = []
+                
+                # Submit tasks for each row
+                for i, x in enumerate(tqdm(self.grid.xarray, desc="Assigning Rows")):
+                    futures.append(executor.submit(process_row, i, self.nusc_map, self.rec, self.grid, prnt))
+
+                # Collect results from all tasks
+                for future in tqdm(futures, desc="Assigning Layers", total=len(futures)):
+                    row_results = future.result()  # Each future returns a list of (x, y, layers) for the row
+                    all_results.extend(row_results)  # Merge row results
+
+            # Once all results are gathered, apply them to the grid in a single pass
+            for x, y, layers in all_results:
+                self.grid.grid[x][y].layers = layers
+
+            self.grid.has_assigned_layers = True
+            print(f'Elements per second: {elements / (time.time() - start_time)}')
+            print('Grid layers assigned.')
+
+            self.save_grid(filename)
+        else:
+            print('Grid already has assigned layers')
+
+
+
 
     # this function getsall the records within the patch of the map
     def get_records_in_patch(self, patch):
