@@ -18,7 +18,7 @@ from nuscenes.map_expansion.bitmap import BitMap
 LIDAR_RANGE = 5 # 50 meter
 RESOLUTION = 1 # meter
 
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+dataroot = r'C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/' 
 map_name = 'singapore-onenorth'
 
 map_width = 2979.5

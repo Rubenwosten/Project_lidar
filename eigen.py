@@ -23,7 +23,7 @@ import torch
 
 nusc = NuScenes(version='v1.0-mini', verbose=False)
 
-nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/v1.0-mini', map_name='singapore-onenorth')
+nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes', map_name='singapore-onenorth')
 bitmap = BitMap(nusc_map.dataroot, nusc_map.map_name, 'basemap')
 
 helper = PredictHelper(nusc)
@@ -128,9 +128,32 @@ print(gespl)
 print(prob)
 print(layers_2)
 
-pad = 'C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/v1.0-mini/sweeps/LIDAR_TOP'
-bestand = 'n008-2018-08-01-15-16-36-0400__LIDAR_TOP__1533151603597909.pcd.bin'
-file_path = os.path.join(pad, bestand)
-file = open(file_path)
-cont = file.read(type = float)
-print(cont)
+sample = nusc.sample[2]
+info =nusc.list_sample(sample['token'])
+
+info =  nusc.get('sample_data', '9f13d5e7d3274792910807e08f10dfbf')
+print (info)
+path = 'C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/samples/LIDAR_TOP/n015-2018-07-24-11-22-45+0800__LIDAR_TOP__1532402928698048.pcd.bin'
+
+x = np.empty(0)
+y = np.empty(0)
+som = 0
+lidar_punt=0
+
+with open(path, "rb") as f:
+    number = f.read(4)
+    print (number)
+    while number != b"":
+        quo, rem = divmod(som,5)
+        if rem == 0:
+            x = np.append(x,np.frombuffer(number, dtype=np.float32))
+        elif rem ==1:
+            y = np.frombuffer(number, dtype=np.float32)
+            lidar_punt += 1
+        number = f.read(4)
+        som +=1
+print (lidar_punt)
+print(x)
+print(np.max(x))
+
+

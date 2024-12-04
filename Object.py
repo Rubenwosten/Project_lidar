@@ -83,7 +83,7 @@ class Object:
             pot_loc = np.array([self.routes[2*i][0],self.routes[2*i+1][0]])
             bound = Bound_normal_frame+pot_loc
             j = np.min(bound[:][0])
-            while j!=np.max(bound[:][1]):
+            while j!=np.max(bound[:][0]):
                 k = np.min(bound[:][1])
                 while k!=np.max(bound[:][1]):
                     #cell.risk.trajactory(j,k)=1-self.prob[i]
