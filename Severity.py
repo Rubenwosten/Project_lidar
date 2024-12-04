@@ -76,11 +76,22 @@ class severity:
         "score": 1.347666667,
         "orientation": 1
     }
+
+
+
     }
     orientation_f={
         "front": 1,
         "side": 1,
         "rear": 1
     }
+
+
+    def factor(traffic_participant_f, orientation_f):
+        if "orientation" <= 1:
+            sev = "score" * orientation_f
+        else:
+            sev = "score" 
+        return sev
 
 
