@@ -20,7 +20,11 @@ RESOLUTION = 0.5 # meter
 
 risk_weights = (1, 1, 1) 
 
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
+#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+
+
+
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
 map_width = 2979.5
