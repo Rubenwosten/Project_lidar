@@ -34,15 +34,26 @@ scene_id = 1
 
 filename = 'layer map boston scene 1 high res'
 
-map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
+def main():
+    print("Starting main function...")  # Debugging line
+    map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
-map.assign_layer(filename, prnt = False)
+    # Assign layers to the grid in parallel
+    map.assign_layer(filename, prnt=False)
 
-risk = Risk()
+    # Initialize risk calculation
+    risk = Risk()
 
-for sample in map.samples:
-    risk.CalcRisk(map, risk_weights)
+    # Calculate risk for each sample
+    for sample in map.samples:
+        risk.CalcRisk(map, risk_weights)
 
-Visualise.plot_grid(map.grid)
+    # Visualize the grid
+    Visualise.plot_grid(map.grid)
 
-print('Done')
+    print('Done')
+
+# This ensures that the code is only executed when the script is run directly
+if __name__ == '__main__':
+    print("Running as main module...")  # Debugging line
+    main()

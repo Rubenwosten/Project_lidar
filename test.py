@@ -23,4 +23,3 @@ filename = 'layer map boston scene 1 high res'
 map.load_grid(filename)
 
 Visualise.plot_grid(map.grid)
-
