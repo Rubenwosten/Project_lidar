@@ -19,7 +19,7 @@ class detect():
             self.file = self.file_get()
             self.lidar_coor()
             self.oud = samp
-        else: returnS
+        else: return
 
 
     def file_get(self):
