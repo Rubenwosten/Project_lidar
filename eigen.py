@@ -79,7 +79,6 @@ def Anns(sample):
 
 samples = samples_scene(first, last)
 anns = Anns(samples[3])
-print(anns[20])
 
 static_layer_rasterizer = StaticLayerRasterizer(helper)
 agent_rasterizer = AgentBoxesWithFadedHistory(helper, seconds_of_history=1)
@@ -124,15 +123,16 @@ def route_splitser(route_tensor, num_of_modes,route_length):
 num = 5
 length = 24
 gespl, prob = route_splitser(route, num, length)
-print(gespl)
-print(prob)
-print(layers_2)
+
 
 sample = nusc.sample[2]
-info =nusc.list_sample(sample['token'])
 
-info =  nusc.get('sample_data', '9f13d5e7d3274792910807e08f10dfbf')
-print (info)
+
+info =  nusc.get('sample', sample['token'])
+info = nusc.get('sample_data',info['data']['LIDAR_TOP'])
+file = info['filename']
+
+print (file)
 path = 'C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/samples/LIDAR_TOP/n015-2018-07-24-11-22-45+0800__LIDAR_TOP__1532402928698048.pcd.bin'
 
 x = np.empty(0)
@@ -152,8 +152,6 @@ with open(path, "rb") as f:
             lidar_punt += 1
         number = f.read(4)
         som +=1
-print (lidar_punt)
-print(x)
-print(np.max(x))
+
 
 
