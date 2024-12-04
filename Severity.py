@@ -1,3 +1,4 @@
+from nuscenes import NuScenes
 from Object import Object
 
 
