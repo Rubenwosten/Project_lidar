@@ -4,7 +4,8 @@ from Map import Map
 LIDAR_RANGE = 5 # 50 meter
 RESOLUTION = 1 # meter
 
-dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
+#dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 map_name = 'boston-seaport' #'singapore-onenorth'
 
 map_width = 2979.5
