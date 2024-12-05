@@ -17,6 +17,13 @@ class Grid:
         self.has_assigned_layers = False
         print('grid of width {} and length {} was created with {} elements'.format(self.width, self.length, self.width * self.length))
         
+    def get_cell(self, x, y):
+        if 0 <= x < self.width and 0 <= y < self.length:
+            return self.grid[x][y]
+        else:
+            raise IndexError(f"Cell coordinates ({x}, {y}) are out of bounds. "
+                             f"Grid size is width={self.width}, length={self.length}.")
+
     def get_layer_matrix(self):
         """
         Returns a 2D matrix of layer values for visualization.

@@ -1,12 +1,13 @@
 from nuscenes.nuscenes import NuScenes 
 import numpy as np
 
-class detect():
-    def __init__(self, sample,):
+class Detect:
+    def __init__(self, sample, map):
         self._sample=sample
         self.oud = None
         self.nusc = NuScenes(version='v1.0-mini', verbose=False)
         self.file = None
+        self.map = map
 
     @property
     def sample(self):
@@ -40,7 +41,7 @@ class detect():
                 elif rem ==1:
                     y = np.frombuffer(number, dtype=np.float32)
                     lidar_punt += 1
-                    # cell(x,y).lidar_aantal += 1
+                    self.map.grid.get_cell(x,y).lidar_aantal += 1
                     x,y = None
                 number = f.read(4)
             som +=1

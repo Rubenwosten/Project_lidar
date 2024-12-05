@@ -97,12 +97,12 @@ class Object:
             i +=1
         return gespilts, prob
 
-    def risk_to_cell(self, box):
+    def risk_to_cell(self, box, map):
             j = np.min(box[:][0])
             while j!=np.max(box[:][0]):
                 k = np.min(box[:][1])
                 while k!=np.max(box[:][1]):
-                    #cell.risk.trajactory(j,k)=1-self.prob[i]
+                    map.grid.get_cell(j,k).track_risk=1-self.prob[i]
                     k+=self.reso
                 j+=self.reso
     
