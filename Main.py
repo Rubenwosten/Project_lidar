@@ -21,9 +21,15 @@ LIDAR_RANGE = 5 # 50 meter
 RESOLUTION = 1 # meter
 
 risk_weights = (1, 1, 1) 
+<<<<<<< HEAD
 dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
 #dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+=======
+
+#dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+>>>>>>> c26437e6a17c5f1a146aa4d0c7da9f863fc9c0e1
 
 
 
@@ -38,7 +44,7 @@ ego = (x, y)
 
 scene_id = 1
 
-filename = 'layer map boston scene 1 high res'
+filename = 'layer map boston scene 1'
 
 def main():
     print("Starting main function...")  # Debugging line
@@ -60,6 +66,8 @@ def main():
         risk.CalcRisk(map, risk_weights)
         
 
+    map.save_grid(filename)
+    
     # Visualize the grid
     Visualise.plot_grid(map.grid)
 

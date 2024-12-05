@@ -4,11 +4,11 @@ from Object import Object
 
 # this class designates a severity function according to identified objects and their orientation
 class severity:
-    def factor(traffic_participant, orientation):
-        traffic_participant_f = {
+    def factor(traffic_participant, orientation, ego_orientation): 
+        traffic_participant_f = {       #the dictionary which defines severity factor according to traffic participant
         "human.pedestrian.adult": {
-            "score": 0.843333333,
-            "orientation": 0
+            "score": 0.843333333,       #the factor based on category
+            "orientation": 0            #wether the orientation of the participant is relevant or not
         },
         "human.pedestrian.child": {
             "score": 0.873,
@@ -82,23 +82,28 @@ class severity:
 
 
         }
-        orientation_f={
+        orientation_f={             #the dictionary defining the orientation factor vs ego vehicle
+            "front": 1.5,
+            "side": 1,
+            "rear": 0.9
+        }
+
+        ego_orientation_f={
             "front": 1,
             "side": 1,
             "rear": 1
         }
-
     
-
+        #extracting all values according to the traffic participant
         participant_score= traffic_participant_f[traffic_participant]["score"]
-
-
-        #participant_score=traffic_participant_f.get(traffic_participant, 1)
         io=traffic_participant_f[traffic_participant]["orientation"]
         o_factor= orientation_f.get(orientation, 1)
+        e_o_factor= ego_orientation_f.get(ego_orientation, 1)
 
-        print(participant_score, io, o_factor)
+        #debug
+        print(participant_score, io, o_factor, e_o_factor)
         
+        #severity calculation function
         if io == 1:
             sev = participant_score * o_factor
             print(sev)

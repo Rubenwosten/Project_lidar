@@ -5,8 +5,9 @@ import numpy as np
 class Grid:
 
     def __init__(self, patch, resolution):
-   
+        self.patch = patch 
         x_min, x_max , y_min, y_max = patch
+        self.res = resolution
         self.width = int((x_max - x_min)/resolution)
         self.length = int((y_max - y_min)/resolution)
         self.xarray = np.linspace(x_min, x_max, self.width)
@@ -25,22 +26,28 @@ class Grid:
                              f"Grid size is width={self.width}, length={self.length}.")
 
     def get_layer_matrix(self):
-        """
-        Returns a 2D matrix of layer values for visualization.
-        """
         return [[cell.layer for cell in row] for row in self.grid]
     
+    def get_total_risk_matrix(self):
+        return [[cell.total_risk for cell in row] for row in self.grid]
+    
+    def get_static_risk_matrix(self):
+        return [[cell.static_risk for cell in row] for row in self.grid]
+    
+    def get_detect_risk_matrix(self):
+        return [[cell.detect_risk for cell in row] for row in self.grid]
+    
+    def get_track_risk_matrix(self):
+        return [[cell.track_risk for cell in row] for row in self.grid]
+
     def to_dict(self):
         """
         Convert the Grid object into a dictionary format for saving.
         """
         # Include x_min, x_max, y_min, y_max, and resolution
         return {
-            'x_min': self.xarray[0],
-            'x_max': self.xarray[-1],
-            'y_min': self.yarray[0],
-            'y_max': self.yarray[-1],
-            'resolution': (self.xarray[1] - self.xarray[0]) if len(self.xarray) > 1 else 1,
+            'patch': self.patch,
+            'resolution': self.res,
             'width': self.width,
             'length': self.length,
             'grid': [[cell.to_dict() for cell in row] for row in self.grid],  # Convert all cells to dictionaries
@@ -53,15 +60,12 @@ class Grid:
         """
         Convert a dictionary back into a Grid object.
         """
-        # Extract necessary data to recreate the patch and resolution
-        x_min = grid_dict['grid'][0][0]['x']  # First cell's x-coordinate
-        x_max = grid_dict['grid'][-1][-1]['x']  # Last cell's x-coordinate
-        y_min = grid_dict['grid'][0][0]['y']  # First cell's y-coordinate
-        y_max = grid_dict['grid'][-1][-1]['y']  # Last cell's y-coordinate
-        resolution = (x_max - x_min) / (grid_dict['width'] - 1)
+        # Extract original patch and resolution
+        patch = grid_dict['patch']
+        resolution = grid_dict['resolution']
 
-        # Create the Grid object
-        grid = Grid(patch=(x_min, x_max, y_min, y_max), resolution=resolution)
+        # Recreate the Grid object with the exact same patch and resolution
+        grid = Grid(patch=patch, resolution=resolution)
 
         # Restore other attributes
         grid.width = grid_dict['width']
