@@ -192,26 +192,32 @@ class Map:
 
     # this function assigns the layers variable of each cell based on the records within the map
     def assign_layer(self, filename, prnt = False):
-        if (self.grid.has_assigned_layers == False):
+
+        # Check if the file exists and load the grid if it does
+        if os.path.exists(filename):
+            print(f"File '{filename}' found. Loading the grid...")
+            self.grid = self.load_grid(filename)
+        else:
+            print(f"File '{filename}' not found. Assigning layers to the grid.")
             elements = self.grid.width * self.grid.length
             time_per_element = 1 / 22.72795127375305
-            print('assigning layers to the grid with {} elements'.format(elements))
-            print('estimated time till completion = {} seconds'.format(elements * time_per_element))
+            print(f"Assigning layers to the grid with {elements} elements.")
 
             start_time = time.time()
             for i, x in enumerate(tqdm(self.grid.xarray)):
-                if(prnt):
-                    print('assigning for i = {} and x = {} at time = {}'.format(i, x, time.time() - start_time))
+                if prnt:
+                    print(f"Assigning for i = {i} and x = {x} at time = {time.time() - start_time:.2f}")
                 for j, y in enumerate(self.grid.yarray):
                     self.grid.grid[i][j].layers = self.nusc_map.layers_on_point_v2(x, y, self.rec)
-                    self.grid.grid[i][j].assign_layer(prnt = False)
-            self.grid.has_assigned_layers = True
+                    self.grid.grid[i][j].assign_layer(prnt=False)
+            self.has_assigned_layers = True
 
-            print('elements per second = {}'.format(elements / (time.time() - start_time)))
-            print('grid layers were assigned')
+            elapsed_time = time.time() - start_time
+            print(f"Elements per second = {elements / elapsed_time:.2f}")
+            print("Grid layers were assigned.")
+
+            # Save the updated grid
             self.save_grid(filename)
-        else:
-            print('grid already has assigned layers')
 
 
         

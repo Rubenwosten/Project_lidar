@@ -1,5 +1,6 @@
 from Visualise import Visualise
 from Map import Map
+from Risk import Risk
 
 LIDAR_RANGE = 5 # 50 meter
 RESOLUTION = 1 # meter
@@ -22,5 +23,12 @@ map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESO
 filename = 'layer map boston scene 1'
 
 map.load_grid(filename)
+
+# Initialize risk calculation
+risk = Risk()
+
+# Calculate risk for each sample
+for sample in map.samples:
+    risk.CalcRisk(map, (1,1,1))
 
 Visualise.plot_grid(map.grid)

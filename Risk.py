@@ -16,16 +16,7 @@ class Risk:
         if not hasattr(self, "initialized"):  # Prevent re-initialization
             self.initialized = True
 
-    
     def CalcRisk(self, map, weights):
-        for cell in map.grid:
-            cell.detect_risk = self.DetectionRisk(cell)
-            cell.track_risk = self.self.TrackingRisk(cell)
-            cell.CalcRisk(weights)
-        return
-    
-
-    def CalcRisk(self, weights):
         """
         Calculate the total risk as a weighted sum of static_risk, detect_risk, and track_risk.
 
@@ -36,8 +27,11 @@ class Risk:
             raise ValueError("Weights must be a tuple of length 3 (w_static, w_detect, w_track).")
         
         w_static, w_detect, w_track = weights
-        self.risk = w_static * self.static_risk + w_detect * self.detect_risk + w_track * self.track_risk
-        return self.risk
+
+        for cells in map.grid.grid:
+            for cell in cells:
+                cell.total_risk = w_static * cell.static_risk + w_detect * cell.detect_risk + w_track * cell.track_risk
+        
 
     # Is handled in the layer assignment code
     def StaticRisk(self):

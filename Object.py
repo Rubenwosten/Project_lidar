@@ -29,8 +29,6 @@ class Object:
         #data object
         self._sample = None
         self.oud = None
-
-
         
         #nusc function
         self.reso=reso

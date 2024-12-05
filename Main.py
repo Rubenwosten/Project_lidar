@@ -15,13 +15,13 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 0.5 # meter
+LIDAR_RANGE = 5 # 50 meter
+RESOLUTION = 1 # meter
 
 risk_weights = (1, 1, 1) 
 
-dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 
 
@@ -36,7 +36,7 @@ ego = (x, y)
 
 scene_id = 1
 
-filename = 'layer map boston scene 1 high res'
+filename = 'layer map boston scene 1'
 
 def main():
     print("Starting main function...")  # Debugging line
@@ -52,6 +52,8 @@ def main():
     for sample in map.samples:
         risk.CalcRisk(map, risk_weights)
 
+    map.save_grid(filename)
+    
     # Visualize the grid
     Visualise.plot_grid(map.grid)
 
