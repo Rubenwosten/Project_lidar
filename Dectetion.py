@@ -3,9 +3,23 @@ import numpy as np
 
 class detect():
     def __init__(self, sample,):
-        self.sample=sample
+        self._sample=sample
+        self.oud = None
         self.nusc = NuScenes(version='v1.0-mini', verbose=False)
-        self.file = self.file_get()
+        self.file = None
+
+    @property
+    def sample(self):
+        return self._sample
+    
+    @sample.setter
+    def sample(self, samp):
+        self._sample = samp
+        if self._sample != self.oud:
+            self.file = self.file_get()
+            self.lidar_coor()
+            self.oud = samp
+        else: return
 
 
     def file_get(self):
