@@ -89,8 +89,8 @@ class severity:
         }
 
         ego_orientation_f={
-            "front": 1,
-            "side": 1,
+            "front": 2,
+            "side": 1.5,
             "rear": 1
         }
     
@@ -105,10 +105,10 @@ class severity:
         
         #severity calculation function
         if io == 1:
-            sev = participant_score * o_factor
+            sev = participant_score * o_factor * e_o_factor
             print(sev)
         else:
-            sev = participant_score
+            sev = participant_score * e_o_factor
             print(sev)
         return sev
 
