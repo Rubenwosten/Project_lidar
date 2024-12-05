@@ -25,17 +25,18 @@ num_of_modes = 5
 lengte = 24
 
 class Object:
-    def __init__(self,instancetoken, sampletoken, translation, rotation, size, catogory,reso ):
+    def __init__(self,reso, map ):
         #data object
         self._sample = None
         self.oud = None
+        self.map = map
 
 
         
         #nusc function
         self.reso=reso
         self.nusc = NuScenes(version='v1.0-mini', verbose=False)
-        self.nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/v1.0-mini', map_name='singapore-onenorth')
+        self.nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes', map_name='singapore-onenorth')
         self.helper = helper = PredictHelper(self.nusc)
         #Prediction function
         self.static_layer_rasterizer = StaticLayerRasterizer(helper)
@@ -57,11 +58,13 @@ class Object:
             for i in range(len(anns)):
                 ans = anns[i]
                 info = self.nusc.get(('sample_annotation', ans))
+                rot = np.arctan2((2*(info['rotation'][0]*info['rotation'][3]+info['rotation'][1]*info['rotation'][2])),(1-2*(info['rotation'][3]**2+info['rotation'][2]**2)))
                 voor = self.voorspelling(ans)
                 gespl , prob = self.route_splitser(num_of_modes,lengte, voor)
                 j=0
                 for j in range(num_of_modes):
-                    box = self.bounding_box(info['size'], info['rotation'], gespl[2*i][0], gespl[2*i+1][0])
+                    box = self.bounding_box(info['size'], rot, gespl[2*i][0], gespl[2*i+1][0])
+                    self.risk_to_cell(box, self.map)
                     j+=1
                 i+=1
                 self.oud = samp
@@ -97,18 +100,19 @@ class Object:
             i +=1
         return gespilts, prob
 
-    def risk_to_cell(self, box, map):
-            j = np.min(box[:][0])
-            while j!=np.max(box[:][0]):
-                k = np.min(box[:][1])
-                while k!=np.max(box[:][1]):
-                    map.grid.get_cell(j,k).track_risk=1-self.prob[i]
-                    k+=self.reso
-                j+=self.reso
+    def risk_to_cell(self, box, map,prob):
+            for i in range (num_of_modes):
+                j = np.min(box[:][0])
+                while j!=np.max(box[:][0]):
+                    k = np.min(box[:][1])
+                    while k!=np.max(box[:][1]):
+                        map.grid.get_cell(j,k).track_risk=1-prob[i]
+                        k+=self.reso
+                    j+=self.reso
     
     def bounding_box(self, size, rotation, x, y):
         box = np.array([-0.5*size[0],-0.5*size[1]], [0.5*size[0],-0.5*size[1]], [-0.5*size[0],0.5*size[1]], [0.5*size[0],0.5*size[1]])
-        rot = np.array([rotation[0],-rotation[1]],[rotation[1],rotation[0]])
+        rot = np.array([np.cos(rotation),-np.sin(rotation)],[np.sin(rotation),np.cos(rotation)])
         rotbox = np.dot(rot,box)
         rotbox = rotbox + np.array([x,y])
         return rotbox
