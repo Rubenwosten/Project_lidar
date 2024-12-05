@@ -9,18 +9,20 @@ from Grid import Grid
 from Map import Map
 from Visualise import Visualise
 from Risk import Risk
+from Object import Object
+from Dectetion import Detect
 
 from nuscenes.nuscenes import NuScenes
 from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 0.5 # meter
+LIDAR_RANGE = 5 # 50 meter
+RESOLUTION = 1 # meter
 
 risk_weights = (1, 1, 1) 
-
-dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
+dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+#dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
 #dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 
@@ -47,10 +49,16 @@ def main():
 
     # Initialize risk calculation
     risk = Risk()
+    obj = Object(RESOLUTION,map)
+    dec = Detect()
 
     # Calculate risk for each sample
     for sample in map.samples:
+        obj.sample= sample
+        
+        #dec.sample = sample
         risk.CalcRisk(map, risk_weights)
+        
 
     # Visualize the grid
     Visualise.plot_grid(map.grid)

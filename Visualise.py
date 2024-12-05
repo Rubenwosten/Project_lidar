@@ -23,6 +23,20 @@ class Visualise:
         'carpark_area': 'lightblue'
     }
 
+    Trac_risk_colours = {
+        0:'white',
+        0.1:'green', 
+        0.2:'brown',
+        0.3: 'darkred',
+        0.4: 'yellow',
+        0.5: 'lightblue',
+        0.6:'tan',
+        0.7: 'red',
+        0.8: 'lightred',
+        0.9: 'darkblue',
+        1.0: 'orange'
+    }
+
 
     @staticmethod
     def plot_grid(grid, prnt = False):
