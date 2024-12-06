@@ -1,12 +1,13 @@
 from Visualise import Visualise
 from Map import Map
 from Risk import Risk
+from Severity import severity
 
 LIDAR_RANGE = 5 # 50 meter
 RESOLUTION = 1 # meter
 
-#dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
+#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 map_name = 'boston-seaport' #'singapore-onenorth'
 
 map_width = 2979.5
@@ -31,4 +32,7 @@ risk = Risk()
 for sample in map.samples:
     risk.CalcRisk(map, (1,1,1))
 
-Visualise.plot_grid(map.grid)
+
+severity.factor("vehicle.construction", "front", "front")
+
+#Visualise.plot_grid(map.grid)
