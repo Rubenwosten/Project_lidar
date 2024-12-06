@@ -21,15 +21,9 @@ LIDAR_RANGE = 5 # 50 meter
 RESOLUTION = 1 # meter
 
 risk_weights = (1, 1, 1) 
-<<<<<<< HEAD
 dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
 #dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
-=======
-
-#dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
->>>>>>> c26437e6a17c5f1a146aa4d0c7da9f863fc9c0e1
 
 
 
@@ -56,14 +50,15 @@ def main():
     # Initialize risk calculation
     risk = Risk()
     obj = Object(RESOLUTION,map)
-    dec = Detect()
+    dec = Detect(map, dataroot)
 
     # Calculate risk for each sample
     for sample in map.samples:
-        obj.sample= sample
+        #obj.sample= sample
         
-        #dec.sample = sample
+        dec.sample = sample
         risk.CalcRisk(map, risk_weights)
+        print ("sample complete ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja")
         
 
     map.save_grid(filename)

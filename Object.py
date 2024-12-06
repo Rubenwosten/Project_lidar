@@ -57,25 +57,28 @@ class Object:
             anns = info['anns']
             for i in range(len(anns)):
                 ans = anns[i]
-                info = self.nusc.get(('sample_annotation', ans))
+                info = self.nusc.get('sample_annotation', ans)
                 rot = np.arctan2((2*(info['rotation'][0]*info['rotation'][3]+info['rotation'][1]*info['rotation'][2])),(1-2*(info['rotation'][3]**2+info['rotation'][2]**2)))
-                voor = self.voorspelling(ans)
+                voor = self.voorspelling(info['instance_token'])
                 gespl , prob = self.route_splitser(num_of_modes,lengte, voor)
                 j=0
-                for j in range(num_of_modes):
-                    box = self.bounding_box(info['size'], rot, gespl[2*i][0], gespl[2*i+1][0])
-                    self.risk_to_cell(box, self.map)
-                    j+=1
-                i+=1
+                if np.isnan(gespl).any():
+                    i+=1
+                else:
+                    for j in range(num_of_modes):
+                            box = self.bounding_box(info['size'], rot, int(gespl[2*i][0] + info['translation'][0]), int(gespl[2*i+1][0]+ info['translation'][1]))
+                            self.risk_to_cell(box, prob)
+                            j+=1
+                    i+=1
                 self.oud = samp
         else: return
 
 
     def voorspelling(self,objecttoken):
-        img = self.mtp_input_representation.make_input_representation(objecttoken,self.sampletoken)
-        agent_state_vector = torch.Tensor([[self.helper.get_velocity_for_agent(objecttoken, self.sampletoken),
-                                    self.helper.get_acceleration_for_agent(objecttoken, self.sampletoken),
-                                    self.helper.get_heading_change_rate_for_agent(objecttoken, self.sampletoken)]])
+        img = self.mtp_input_representation.make_input_representation(objecttoken,self._sample)
+        agent_state_vector = torch.Tensor([[self.helper.get_velocity_for_agent(objecttoken, self._sample),
+                                    self.helper.get_acceleration_for_agent(objecttoken, self._sample),
+                                    self.helper.get_heading_change_rate_for_agent(objecttoken, self._sample)]])
         image_tensor = torch.Tensor(img).permute(2, 0, 1).unsqueeze(0)
         voorspelling = self.mtp(image_tensor, agent_state_vector)
         return voorspelling
@@ -100,20 +103,28 @@ class Object:
             i +=1
         return gespilts, prob
 
-    def risk_to_cell(self, box, map,prob):
+    def risk_to_cell(self, box,prob):
             for i in range (num_of_modes):
                 j = np.min(box[:][0])
                 while j!=np.max(box[:][0]):
                     k = np.min(box[:][1])
                     while k!=np.max(box[:][1]):
-                        map.grid.get_cell(j,k).track_risk=1-prob[i]
+                        self.map.grid.get_cell(j,k).track_risk=1-prob[i]
                         k+=self.reso
                     j+=self.reso
     
     def bounding_box(self, size, rotation, x, y):
-        box = np.array([-0.5*size[0],-0.5*size[1]], [0.5*size[0],-0.5*size[1]], [-0.5*size[0],0.5*size[1]], [0.5*size[0],0.5*size[1]])
-        rot = np.array([np.cos(rotation),-np.sin(rotation)],[np.sin(rotation),np.cos(rotation)])
-        rotbox = np.dot(rot,box)
+        box = np.array([
+            [-0.5 * size[0], -0.5 * size[1]],
+            [0.5 * size[0], -0.5 * size[1]],
+            [-0.5 * size[0], 0.5 * size[1]],
+            [0.5 * size[0], 0.5 * size[1]]
+            ])
+        rot = rot = np.array([
+            [np.cos(rotation), -np.sin(rotation)],
+            [np.sin(rotation), np.cos(rotation)]
+        ])
+        rotbox = np.dot(rot,box.T).T
         rotbox = rotbox + np.array([x,y])
         return rotbox
     
