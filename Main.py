@@ -46,16 +46,11 @@ def main():
     obj = Object(RESOLUTION,map)
     dec = Detect(map, dataroot)
 
-    # Calculate risk for each sample
-    for sample in map.samples:
-        #obj.sample= sample
-        
-        dec.sample = sample
-        risk.CalcRisk(map, risk_weights)
-        print ("sample complete ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja")
-        
+    # Calculate risk for each sample        
     for i, sample in enumerate(map.samples):
+        dec.sample = sample
         risk.CalcRisk(map, risk_weights, i)
+        print ("sample complete ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja")
 
     map.save_grid(filename)
     

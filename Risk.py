@@ -19,7 +19,7 @@ class Risk:
 
     
 
-    def CalcRisk(self, map, weights):
+    def CalcRisk(self, map, weights, i):
         """
         Calculate the total risk as a weighted sum of static_risk, detect_risk, and track_risk.
 
