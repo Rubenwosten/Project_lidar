@@ -16,7 +16,10 @@ class Risk:
         if not hasattr(self, "initialized"):  # Prevent re-initialization
             self.initialized = True
 
-    def CalcRisk(self, map, weights, i):
+
+    
+
+    def CalcRisk(self, map, weights):
         """
         Calculate the total risk as a weighted sum of static_risk, detect_risk, and track_risk.
 

@@ -3,13 +3,14 @@ from Map import Map
 from Risk import Risk
 import os
 import matplotlib.pyplot as plt
+from Severity import severity
 
 
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 2 # meter
 
-#dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
+#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 map_name = 'boston-seaport' #'singapore-onenorth'
 
 map_width = 2979.5
@@ -62,3 +63,7 @@ if os.path.exists(filename):
 else:
     print(f"{filename} was not found")
 
+
+severity.factor("vehicle.construction", "front", "front")
+
+#Visualise.plot_grid(map.grid)

@@ -22,7 +22,7 @@ import torch
 
 
 nusc = NuScenes(version='v1.0-mini', verbose=False)
-
+dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes'
 nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes', map_name='singapore-onenorth')
 bitmap = BitMap(nusc_map.dataroot, nusc_map.map_name, 'basemap')
 
@@ -78,80 +78,81 @@ def Anns(sample):
     return anns_Move
 
 samples = samples_scene(first, last)
-anns = Anns(samples[3])
+info = nusc.get('sample', samples[0])
+anns = info['anns']
+a = anns[0]
+info = nusc.get('sample_annotation', a)
+print (info)
 
-static_layer_rasterizer = StaticLayerRasterizer(helper)
-agent_rasterizer = AgentBoxesWithFadedHistory(helper, seconds_of_history=1)
-mtp_input_representation = InputRepresentation(static_layer_rasterizer, agent_rasterizer, Rasterizer())
+lidar_info =nusc.calibrated_sensor[5]
+h= 1.84023
+R = np.empty(24)
+for i in range(len(R)):
+    theta = (i*1.25 -30)/180
+    R[i]= h*math.tan(theta)
 
-img = mtp_input_representation.make_input_representation(anns[1][1],samples[3])
-
-backbone = ResNetBackbone('resnet50')
-mtp = MTP(backbone, num_modes=5)
-
-agent_state_vector = torch.Tensor([[helper.get_velocity_for_agent(anns[20][1], samples[3]),
-                                    helper.get_acceleration_for_agent(anns[20][1], samples[3]),
-                                    helper.get_heading_change_rate_for_agent(anns[20][1], samples[3])]])
-
-
-image_tensor = torch.Tensor(img).permute(2, 0, 1).unsqueeze(0)
-
-route = mtp(image_tensor, agent_state_vector)
-
-
-def route_splitser(route_tensor, num_of_modes,route_length):
-    route_dim = (num_of_modes*2,route_length/2)
-    route_tensor = route_tensor.flatten()
-    routestensor = route_tensor[:num_of_modes * route_length].view(-1)
-    probabilities_tensor = route_tensor[num_of_modes * route_length:]
-    
-    gespilts = routestensor.view(num_of_modes, 2, -1).permute(1, 2, 0).reshape(int(route_dim[0]), int(route_dim[1])).detach().numpy()
-    prob_logit = probabilities_tensor.detach().numpy()
-    som = 0
-    i = 0
-    for i in range(num_of_modes):
-        som += math.exp(prob_logit[i])
-        i+=1
-    i=0
-    prob = np.empty(num_of_modes)
-    for i in range(num_of_modes):
-        prob[i] = math.exp(prob_logit[i])/som
-        i +=1
-    
-    return gespilts, prob
-
-num = 5
-length = 24
-gespl, prob = route_splitser(route, num, length)
+scan = np.empty(36)
+for i in range(len(scan)):
+    phi = i*10
+    for j in range(10):
+        phi+=j
+        phi = phi/180
 
 
-sample = nusc.sample[2]
+info =  nusc.get('sample', first)
+info_2 = nusc.get('sample_data',info['data']['LIDAR_TOP'])
+file = os.path.join(dataroot, info_2['filename'])
+print(file)
+print(type(file))
 
-
-info =  nusc.get('sample', sample['token'])
-info = nusc.get('sample_data',info['data']['LIDAR_TOP'])
-file = info['filename']
-
-print (file)
-path = 'C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes/samples/LIDAR_TOP/n015-2018-07-24-11-22-45+0800__LIDAR_TOP__1532402928698048.pcd.bin'
-
-x = np.empty(0)
-y = np.empty(0)
 som = 0
 lidar_punt=0
-
-with open(path, "rb") as f:
+            
+with open(file, "rb") as f:
     number = f.read(4)
     print (number)
     while number != b"":
         quo, rem = divmod(som,5)
         if rem == 0:
-            x = np.append(x,np.frombuffer(number, dtype=np.float32))
+            x = np.frombuffer(number, dtype=np.float32)
         elif rem ==1:
             y = np.frombuffer(number, dtype=np.float32)
             lidar_punt += 1
         number = f.read(4)
+        print (number)
         som +=1
+print (som)
 
 
 
+R = 10
+dt = 10
+dt_rad = dt/180
+x= 0
+reso = 1
+theta = 0
+riskcones = np.empty(360/dt)
+total_risk = 0
+for i in range(360/dt):
+    while x < R:
+        if (theta>= -0.5*np.pi and theta<0.5*np.pi):
+            a= 1
+        else: a= -1
+        y1 = x*np.tan(theta)
+        y2 = x*np.tan(theta)
+        if y2 < y1:
+            ymin = y2
+            ymax = y1
+        else:
+            ymin = y1
+            ymax = y2
+        while ymin < ymax:
+            risk = risk.cell(a*x, ymin)
+            riskcones[i] += risk
+            total_risk += risk
+
+for i in range(len(riskcones)):
+    
+
+
+    
