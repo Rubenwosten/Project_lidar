@@ -37,9 +37,11 @@ ego = (x, y)
 
 scene_id = 1
 
-filename = f'boston scene {scene_id} res = {RESOLUTION}'
+filename = 'boston scene'
 
-def main():
+def main(filename, scene_id, LIDAR_RANGE, RESOLUTION):
+    filename = f'{filename} {scene_id} res = {RESOLUTION}'
+
     print("Starting main function...")  # Debugging line
     map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
@@ -75,7 +77,7 @@ def main():
     for i in range(len(map.samples)):
         sample = map.samples[i]
         # do the object tracking risk and object detection risk by setting the sample
-        obj.sample= (sample,x,y,i)
+        # obj.sample= (sample,x,y,i)
         # dec.sample = (sample,x,y)
         print (f"sample {i} complete")
         
@@ -94,7 +96,10 @@ def main():
     map.save_grid(new_filename + ' data')
     print('Done')
 
+resolutions = [1]
+
 # This ensures that the code is only executed when the script is run directly
 if __name__ == '__main__':
     print("Running as main module...")  # Debugging line
-    main()
+    for res in resolutions:
+        main(filename = 'boston scene', scene_id=1, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res)

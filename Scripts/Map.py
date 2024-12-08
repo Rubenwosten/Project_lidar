@@ -46,6 +46,7 @@ class Map:
 
         # make a patch based on the min and max of the coordinates plus the range of the lidar
         self.patch = self.get_patch(self.ego_positions, RANGE)
+        print(f'ego patch = {self.get_patch(self.ego_positions, 0)}')
         print('patch = {}'.format(self.patch))
 
         #TODO add a bit of code that checks if the grid is saved, if so load up the grid
@@ -85,7 +86,7 @@ class Map:
     # This function determines the path of the ego vehicle
     # returns a numpy array of the ego vehicles position
     def ego_pos(self, lidar_samples):
-        ego_trans = np.empty((40,3))
+        ego_trans = np.empty((len(lidar_samples),3))
         i = 0
         for i in range(len(lidar_samples)):
             info = self.nusc.get('sample_data', lidar_samples[i])
