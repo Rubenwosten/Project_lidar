@@ -217,9 +217,8 @@ class Map:
         :param base_filename: The base filename without resolution value
         :param prnt: Whether to print debug information
         """
-        # Append the resolution value to the filename
-        resolution = self.grid.res
-        filename = f"{base_filename} res={resolution}"
+        # Append data to the filename
+        filename = f"{base_filename} data"
 
         # Check if the file with the specific resolution exists
         if os.path.exists(filename):

@@ -27,7 +27,7 @@ width = 101
 length = 84
 
 class Object:
-    def __init__(self,reso, map ):
+    def __init__(self,reso, map, dataroot):
         #data object
         self._sample = None
         self._x= None
@@ -40,8 +40,8 @@ class Object:
         
         #nusc function
         self.reso=reso
-        self.nusc = NuScenes(version='v1.0-mini', verbose=False)
-        self.nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes', map_name='singapore-onenorth')
+        self.nusc = map.nusc
+        self.nusc_map = map.nusc_map
         self.helper = helper = PredictHelper(self.nusc)
         #Prediction function
         self.static_layer_rasterizer = StaticLayerRasterizer(helper)

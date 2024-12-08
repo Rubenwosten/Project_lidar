@@ -24,7 +24,7 @@ scene_id = 1
 
 map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
-filename = 'boston scene 1' + '_res={}'.format(RESOLUTION)
+filename = f'run boston scene {scene_id}\ boston scene {scene_id} res={RESOLUTION}'
 
 if os.path.exists(filename):
     # Load the grid

@@ -19,7 +19,7 @@ from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
 LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 10 # meter
+RESOLUTION = 2 # meter
 
 risk_weights = (1, 1, 1) 
 #dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
@@ -33,7 +33,7 @@ map_height = 2118.1
 
 scene_id = 1
 
-filename = 'boston scene 1'
+filename = f'boston scene {scene_id} res = {RESOLUTION}'
 
 def main():
     print("Starting main function...")  # Debugging line
@@ -42,24 +42,29 @@ def main():
     # Create a folder to save the run and plots if it doesn't already exist
     run_folder = f"run {filename}"  # Include resolution in the plot folder name
     os.makedirs(run_folder, exist_ok=True)
+    new_filename = os.path.join(run_folder, filename)
 
     # Assign layers to the grid in parallel
-    map.assign_layer(filename, prnt=False)
+    map.assign_layer(new_filename, prnt=False)
 
     # Initialize risk calculation
     risk = Risk()
-    obj = Object(RESOLUTION,map)
-    dec = Detect(map, dataroot)
+    #obj = Object(RESOLUTION, map, dataroot)
+    #dec = Detect(map, dataroot)
 
     # Calculate risk for each sample        
     for i, sample in enumerate(map.samples):
-        dec.sample = sample
+        #dec.sample = sample
         risk.CalcRisk(map, risk_weights, i)
 
-    map.save_grid(os.path.join(run_folder, filename))
+    map.save_grid(new_filename + ' data')
     
+    # Create a folder to save the run and plots if it doesn't already exist
+    plots_folder = os.path.join(run_folder, 'plots')
+    os.makedirs(plots_folder, exist_ok=True)
+
     # Layer plot filename
-    layer_plot_filename = os.path.join(run_folder, f"layer_plot_res={RESOLUTION}.png")
+    layer_plot_filename = os.path.join(plots_folder, f"layer_plot_res={RESOLUTION}.png")
     Visualise.show_layers(map.grid)
 
     # Save the layer plot
@@ -71,7 +76,7 @@ def main():
     for i, sample in enumerate(map.samples):
 
         # Risk plot filename
-        risk_plot_filename = os.path.join(run_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
+        risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
         Visualise.show_risks(map.grid, i)  # Show risks for the current iteration
 
         # Save the risk plot
