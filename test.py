@@ -7,10 +7,10 @@ from Severity import severity
 
 
 LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 2 # meter
+RESOLUTION = 10 # meter
 
-dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 map_name = 'boston-seaport' #'singapore-onenorth'
 
 map_width = 2979.5
