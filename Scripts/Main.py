@@ -96,10 +96,10 @@ def main(filename, scene_id, LIDAR_RANGE, RESOLUTION):
     map.save_grid(new_filename + ' data')
     print('Done')
 
-resolutions = [0.5]
+resolutions = [10, 5, 2]
 
 # This ensures that the code is only executed when the script is run directly
 if __name__ == '__main__':
     print("Running as main module...")  # Debugging line
     for res in resolutions:
-        main(filename = 'boston scene', scene_id=4, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res)
+        main(filename = 'boston scene', scene_id=0, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res)
