@@ -1,10 +1,13 @@
 from Visualise import Visualise
 from Map import Map
 from Risk import Risk
+import os
+import matplotlib.pyplot as plt
 from Severity import severity
 
-LIDAR_RANGE = 5 # 50 meter
-RESOLUTION = 1 # meter
+
+LIDAR_RANGE = 50 # 50 meter
+RESOLUTION = 2 # meter
 
 dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
 #dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
@@ -21,16 +24,44 @@ scene_id = 1
 
 map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
-filename = 'layer map boston scene 1'
+filename = 'boston scene 1' + '_res={}'.format(RESOLUTION)
 
-map.load_grid(filename)
+if os.path.exists(filename):
+    # Load the grid
+    map.load_grid(filename)
 
-# Initialize risk calculation
-risk = Risk()
+    # Initialize risk calculation
+    risk = Risk()
 
-# Calculate risk for each sample
-for sample in map.samples:
-    risk.CalcRisk(map, (1,1,1))
+    # Create a folder to save the plots if it doesn't already exist
+    plots_folder = f"plots {filename}"  # Include resolution in the plot folder name
+    os.makedirs(plots_folder, exist_ok=True)
+
+    # Layer plot filename
+    layer_plot_filename = os.path.join(plots_folder, f"layer_plot_res={RESOLUTION}.png")
+    Visualise.show_layers(map.grid)
+
+    # Save the layer plot
+    plt.savefig(layer_plot_filename)
+    plt.close()
+    print(f"Layer plot saved as '{layer_plot_filename}'.")
+
+    # Calculate risk for each sample and save the plot
+    for i, sample in enumerate(map.samples):
+        # Calculate risk
+        risk.CalcRisk(map, (1, 1, 1), i)
+
+        # Risk plot filename
+        risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
+        Visualise.show_risks(map.grid, i)  # Show risks for the current iteration
+
+        # Save the risk plot
+        plt.savefig(risk_plot_filename)
+        plt.close()  # Close the plot to free resources for the next iteration
+
+        print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
+else:
+    print(f"{filename} was not found")
 
 
 severity.factor("vehicle.construction", "front", "front")

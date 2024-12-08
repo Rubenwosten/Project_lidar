@@ -19,7 +19,7 @@ class Risk:
 
     
 
-    def CalcRisk(self, map, weights):
+    def CalcRisk(self, map, weights, i):
         """
         Calculate the total risk as a weighted sum of static_risk, detect_risk, and track_risk.
 
@@ -30,9 +30,12 @@ class Risk:
             raise ValueError("Weights must be a tuple of length 3 (w_static, w_detect, w_track).")
         
         w_static, w_detect, w_track = weights
+        
+
         for cells in map.grid.grid:
             for cell in cells:
-                self.risk = w_static * cell.static_risk + w_detect * cell.detect_risk + w_track * cell.track_risk
+                cell.total_risk[i] = w_static * cell.static_risk + w_detect * cell.detect_risk[i] + w_track * cell.track_risk[i]
+        
 
     # Is handled in the layer assignment code
     def StaticRisk(self):

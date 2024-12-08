@@ -31,7 +31,82 @@ class Visualise:
     }
 
     @staticmethod
-    def plot_grid(grid, prnt=False):
+    def show_layers(grid):
+        """
+        Visualizes the grid's layer matrix.
+
+        Displays the layer grid and creates a legend for the different layers.
+        """
+        # Get the layer matrix
+        layer_matrix = np.transpose(grid.get_layer_matrix())
+
+        # Create the plot
+        fig, ax = plt.subplots(figsize=(10, 8))
+
+        flattened_layers = [layer for row in layer_matrix for layer in row]
+        unique_layers = {layer for layer in flattened_layers if layer}
+
+        # Create legend for the layer plot
+        legend_handles = [Patch(color=Visualise.layer_colours.get(layer, 'white'), label=layer) for layer in unique_layers]
+
+        # Create color matrix for layers
+        color_matrix = np.array([
+            [to_rgba(Visualise.layer_colours.get(layer, 'white')) for layer in row]
+            for row in layer_matrix
+        ])
+
+        ax.imshow(color_matrix, origin='lower')
+        ax.set_title("Layer Grid")
+        ax.legend(handles=legend_handles, loc='upper right')
+
+        plt.tight_layout()
+        #plt.show()
+
+        print('Layer grid visualization complete.')
+
+    @staticmethod
+    def show_risks(grid, index):
+        """
+        Displays a 2x2 subplot grid for risk matrices: Total Risk, Static Risk, Detect Risk, and Track Risk.
+
+        :param grid: The grid object that holds the risk matrices.
+        :param index: The index for the sample (used for dynamic risk calculations).
+        """
+        # Get matrices
+        total_risk_matrix = np.transpose(grid.get_total_risk_matrix(index))
+        static_risk_matrix = np.transpose(grid.get_static_risk_matrix())
+        detect_risk_matrix = np.transpose(grid.get_detect_risk_matrix(index))
+        track_risk_matrix = np.transpose(grid.get_track_risk_matrix(index))
+
+        # Define the figure and 2x2 subplot layout
+        fig, axes = plt.subplots(2, 2, figsize=(12, 10))  # Adjusted figure size
+        axes = axes.flatten()  # Flatten the 2x2 grid into a 1D array for easy iteration
+
+        # Risk matrices and titles
+        risk_matrices = {
+            "Total Risk": total_risk_matrix,
+            "Static Risk": static_risk_matrix,
+            "Detect Risk": detect_risk_matrix,
+            "Track Risk": track_risk_matrix,
+        }
+
+        for i, (title, matrix) in enumerate(risk_matrices.items()):
+            ax = axes[i]
+            im = ax.imshow(matrix, origin='lower', cmap='viridis', norm=Normalize(vmin=np.min(matrix), vmax=np.max(matrix)))
+            ax.set_title(title, fontsize=12)
+
+            # Add colorbar for each subplot
+            cbar = fig.colorbar(ScalarMappable(norm=im.norm, cmap=im.cmap), ax=ax, shrink=0.8)
+            cbar.set_label(title)
+
+        # Adjust layout to avoid overlap
+        plt.tight_layout(pad=5.0)  # Increase padding between subplots for better spacing
+        #plt.show()
+
+        print('Risk grid visualization complete.')
+    
+    @staticmethod
+    def plot_grid(grid, index, prnt=False):
         """
         Visualizes the grid's layer and risk matrices in a combined layout:
         - Large plot for the layer grid.
@@ -39,10 +114,10 @@ class Visualise:
         """
         # Get matrices
         layer_matrix = np.transpose(grid.get_layer_matrix())
-        total_risk_matrix = np.transpose(grid.get_total_risk_matrix())
+        total_risk_matrix = np.transpose(grid.get_total_risk_matrix(index))
         static_risk_matrix = np.transpose(grid.get_static_risk_matrix())
-        detect_risk_matrix = np.transpose(grid.get_detect_risk_matrix())
-        track_risk_matrix = np.transpose(grid.get_track_risk_matrix())
+        detect_risk_matrix = np.transpose(grid.get_detect_risk_matrix(index))
+        track_risk_matrix = np.transpose(grid.get_track_risk_matrix(index))
 
         # Define the figure and gridspec layout
         fig = plt.figure(figsize=(18, 12))  # Adjust figure size
@@ -86,6 +161,6 @@ class Visualise:
             cbar.set_label(title)
 
         plt.tight_layout()
-        plt.show()
+        #plt.show()
 
         print('Grid visualization complete.')

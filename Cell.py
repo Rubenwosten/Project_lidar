@@ -14,7 +14,7 @@ class Cell:
         'carpark_area': 3
     }
 
-    def __init__(self, x, y,layers = None):
+    def __init__(self, x, y, scene_length,layers = None):
         if layers is None:
             layers = {}
         self.x = x
@@ -22,10 +22,10 @@ class Cell:
         self.occ = 0
         self.layers = layers
         self.layer = 'empty'
-        self.total_risk = 0 
+        self.total_risk = [0] * scene_length
         self.static_risk = 0
-        self.detect_risk = 0
-        self.track_risk = 0
+        self.detect_risk = [0] * scene_length
+        self.track_risk = [0] * scene_length
         self.isscanned = False
         self.ofinterest = 0
 
@@ -89,7 +89,7 @@ class Cell:
         }
 
     @staticmethod
-    def from_dict(cell_dict):
+    def from_dict(cell_dict, scene_length):
         """
         Convert a dictionary back into a Cell object.
 
@@ -97,11 +97,11 @@ class Cell:
             'static risk': self.static_risk,
             'detect risk': self.detect_risk,
             'track risk': self.track_risk,
-
         """
         cell = Cell(
             x=cell_dict['x'],
             y=cell_dict['y'],
+            scene_length=scene_length,
             layers=cell_dict['layers']
         )
         cell.occ = cell_dict['occ']
