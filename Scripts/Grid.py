@@ -25,7 +25,23 @@ class Grid:
         else:
             raise IndexError(f"Cell coordinates ({x}, {y}) are out of bounds. "
                              f"Grid size is width={self.width}, length={self.length}.")
+    
+    def count_layers(self):
+        """
+        Count the occurrences of each layer type in the grid.
 
+        :return: Dictionary with layer names as keys and their counts as values
+        """
+        layer_counts = {layer: 0 for layer in Cell.priority_layers}
+
+        for row in self.grid:
+            for cell in row:
+                for layer_name in cell.layers:
+                    if layer_name in layer_counts:
+                        layer_counts[layer_name] += 1
+
+        return layer_counts
+    
     def get_layer_matrix(self):
         return [[cell.layer for cell in row] for row in self.grid]
     

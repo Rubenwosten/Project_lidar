@@ -24,7 +24,7 @@ ego = (x, y)
 scene_id = 1
 
 map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
-
+'''
 filepaths = [os.path.join('run boston scene 1 res = 10','boston scene 1 res = 10 data'),
              os.path.join('run boston scene 1 res = 5','boston scene 1 res = 5 data'),
              os.path.join('run boston scene 1 res = 2','boston scene 1 res = 2 data')]
@@ -32,3 +32,9 @@ filepaths = [os.path.join('run boston scene 1 res = 10','boston scene 1 res = 10
 for filepath in filepaths:
     map.grid = map.load_grid(filepath)
     print(map.grid.grid[0][0].occ)
+    '''
+res = 1
+scene_id = 2
+map.load_grid(os.path.join(f'run boston scene {scene_id} res = {res}',f'boston scene {scene_id} res = {res} data'))
+
+print(map.grid.count_layers())
