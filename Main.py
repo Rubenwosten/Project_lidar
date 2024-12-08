@@ -22,22 +22,19 @@ LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
 
 risk_weights = (1, 1, 1) 
-#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
 map_width = 2979.5
 map_height = 2118.1
 
-<<<<<<< HEAD
 x = 600 # ego_position[0][0]
 y = 1600 # ego_position[0][1]
 ego = (x, y)
 
-=======
->>>>>>> 1b08c6a43f2c18fcdc3534076f06a91e9b4c6b0d
 scene_id = 1
 
 filename = 'boston scene 1'
@@ -51,30 +48,9 @@ def main():
     os.makedirs(run_folder, exist_ok=True)
 
     # Assign layers to the grid in parallel
+
+
     map.assign_layer(filename, prnt=False)
-
-    # Initialize risk calculation
-    risk = Risk()
-    obj = Object(RESOLUTION,map)
-    dec = Detect(map, dataroot)
-
-<<<<<<< HEAD
-    # Calculate risk for each sample
-    for i in range(len(map.samples)):
-        sample = map.samples[i]
-        obj.sample= (sample,x,y,i)
-        print ("sample complete")
-        #dec.sample = (sample,x,y)
-        
-        risk.CalcRisk(map, risk_weights, i)
-        
-        
-=======
-    # Calculate risk for each sample        
-    for i, sample in enumerate(map.samples):
-        dec.sample = sample
-        risk.CalcRisk(map, risk_weights, i)
->>>>>>> 1b08c6a43f2c18fcdc3534076f06a91e9b4c6b0d
 
     map.save_grid(os.path.join(run_folder, filename))
     
@@ -87,10 +63,20 @@ def main():
     plt.close()
     print(f"Layer plot saved as '{layer_plot_filename}'.")
 
-    # Calculate risk for each sample and save the plot
-    for i, sample in enumerate(map.samples):
-        # Calculate risk
-        risk.CalcRisk(map, (1, 1, 1), i)
+    # Initialize risk calculation
+    risk = Risk()
+    obj = Object(RESOLUTION,map, dataroot, map_name)
+    dec = Detect(map, dataroot, x, y)
+
+    # Calculate risk for each sample
+    for i in range(len(map.samples)):
+        sample = map.samples[i]
+        obj.sample= (sample,x,y,i)
+        print ("sample complete")
+        #dec.sample = (sample,x,y)
+        
+        risk.CalcRisk(map, risk_weights, i)
+        
 
         # Risk plot filename
         risk_plot_filename = os.path.join(run_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")

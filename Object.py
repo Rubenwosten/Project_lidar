@@ -23,11 +23,10 @@ import torch
 
 num_of_modes = 5
 lengte = 24
-width = 95
-length = 87
+
 
 class Object:
-    def __init__(self,reso, map ):
+    def __init__(self,reso, map, dataroot, map_name ):
         #data object
         self._sample = None
         self._sampleindex = None
@@ -37,12 +36,14 @@ class Object:
         self.map = map
         self.xmin =595
         self.ymin =1569
+        self.width = self.map.width
+        self.length = self.map.length
 
         
         #nusc function
         self.reso=reso
         self.nusc = NuScenes(version='v1.0-mini', verbose=False)
-        self.nusc_map = NuScenesMap(dataroot='C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes', map_name='singapore-onenorth')
+        self.nusc_map = NuScenesMap(dataroot, map_name)
         self.helper = helper = PredictHelper(self.nusc)
         #Prediction function
         self.static_layer_rasterizer = StaticLayerRasterizer(helper)
@@ -117,7 +118,7 @@ class Object:
                 while j < np.max(box[:,0]):
                     k = np.min(box[:,1])
                     while k < np.max(box[:,1]):
-                        if (int(j-self.xmin)<0 or int(k-self.ymin)<0 or int(j-self.xmin)>=width or int(k-self.ymin)>=length):
+                        if (int(j-self.xmin)<0 or int(k-self.ymin)<0 or int(j-self.xmin)>=self.width or int(k-self.ymin)>=self.length):
                             k+=self.reso
                             
                         else:
