@@ -69,8 +69,6 @@ def main():
 
     # Calculate risk for each sample and save the plot
     for i, sample in enumerate(map.samples):
-        # Calculate risk
-        risk.CalcRisk(map, (1, 1, 1), i)
 
         # Risk plot filename
         risk_plot_filename = os.path.join(run_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
