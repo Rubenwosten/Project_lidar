@@ -23,19 +23,21 @@ import torch
 
 num_of_modes = 5
 lengte = 24
-width = 101
-length = 84
+
 
 class Object:
-    def __init__(self,reso, map, dataroot):
+    def __init__(self,reso, map, dataroot, map_name, dataroot):
         #data object
         self._sample = None
+        self._sampleindex = None
         self._x= None
         self._y = None
         self.oud = None
         self.map = map
         self.xmin =595
         self.ymin =1569
+        self.width = self.map.width
+        self.length = self.map.length
 
         
         #nusc function
@@ -56,7 +58,7 @@ class Object:
     
     @sample.setter
     def sample(self, values):
-        self._sample,self._x, self._y = values
+        self._sample,self._x, self._y, self._sampleindex = values
         if self._sample != self.oud:
             info = self.nusc.get('sample', self._sample)
             anns = info['anns']
@@ -111,15 +113,16 @@ class Object:
             i +=1
         return gespilts, prob
 
-    def risk_to_cell(self, box,prob, i):
+    def risk_to_cell(self, box,prob, i,):
                 j = np.min(box[:,0])
                 while j < np.max(box[:,0]):
                     k = np.min(box[:,1])
                     while k < np.max(box[:,1]):
-                        if (int(j-self.xmin)<0 or int(k-self.ymin)<0 or int(j-self.xmin)>=width or int(k-self.ymin)>=length):
+                        if (int(j-self.xmin)<0 or int(k-self.ymin)<0 or int(j-self.xmin)>=self.width or int(k-self.ymin)>=self.length):
                             k+=self.reso
+                            
                         else:
-                            self.map.grid.get_cell(int(j-self.xmin),int(k-self.ymin)).track_risk+=prob[i]
+                            self.map.grid.get_cell(int(j-self.xmin),int(k-self.ymin)).track_risk[self._sampleindex]+=prob[i]
                             k+=self.reso
                     j+=self.reso
     

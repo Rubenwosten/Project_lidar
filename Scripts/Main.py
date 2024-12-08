@@ -47,6 +47,9 @@ def main():
     # Assign layers to the grid in parallel
     map.assign_layer(new_filename, prnt=False)
 
+
+    map.assign_layer(filename, prnt=False)
+
     # Initialize risk calculation
     risk = Risk()
     #obj = Object(RESOLUTION, map, dataroot)
@@ -74,6 +77,20 @@ def main():
 
     # Calculate risk for each sample and save the plot
     for i, sample in enumerate(map.samples):
+    # Initialize risk calculation
+    risk = Risk()
+    obj = Object(RESOLUTION,map, dataroot, map_name)
+    dec = Detect(map, dataroot, x, y)
+
+    # Calculate risk for each sample
+    for i in range(len(map.samples)):
+        sample = map.samples[i]
+        obj.sample= (sample,x,y,i)
+        print ("sample complete")
+        #dec.sample = (sample,x,y)
+        
+        risk.CalcRisk(map, risk_weights, i)
+        
 
         # Risk plot filename
         risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
