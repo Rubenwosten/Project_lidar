@@ -5,6 +5,7 @@ from tqdm import tqdm
 import numpy as np
 import re
 import Cell
+import os
 from Grid import Grid 
 from Map import Map
 from Visualise import Visualise
@@ -18,22 +19,25 @@ from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
 LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 2 # meter
+RESOLUTION = 10 # meter
 
 risk_weights = (1, 1, 1) 
-dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
 map_width = 2979.5
 map_height = 2118.1
 
+<<<<<<< HEAD
 x = 600 # ego_position[0][0]
 y = 1600 # ego_position[0][1]
 ego = (x, y)
 
+=======
+>>>>>>> 1b08c6a43f2c18fcdc3534076f06a91e9b4c6b0d
 scene_id = 1
 
 filename = 'boston scene 1'
@@ -42,14 +46,19 @@ def main():
     print("Starting main function...")  # Debugging line
     map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
+    # Create a folder to save the run and plots if it doesn't already exist
+    run_folder = f"run {filename}"  # Include resolution in the plot folder name
+    os.makedirs(run_folder, exist_ok=True)
+
     # Assign layers to the grid in parallel
     map.assign_layer(filename, prnt=False)
 
     # Initialize risk calculation
     risk = Risk()
     obj = Object(RESOLUTION,map)
-    dec = Detect(map, dataroot,x,y)
+    dec = Detect(map, dataroot)
 
+<<<<<<< HEAD
     # Calculate risk for each sample
     for i in range(len(map.samples)):
         sample = map.samples[i]
@@ -60,11 +69,38 @@ def main():
         risk.CalcRisk(map, risk_weights, i)
         
         
+=======
+    # Calculate risk for each sample        
+    for i, sample in enumerate(map.samples):
+        dec.sample = sample
+        risk.CalcRisk(map, risk_weights, i)
+>>>>>>> 1b08c6a43f2c18fcdc3534076f06a91e9b4c6b0d
 
-    map.save_grid(filename)
+    map.save_grid(os.path.join(run_folder, filename))
     
-    # Visualize the grid
-    Visualise.plot_grid(map.grid, 0)
+    # Layer plot filename
+    layer_plot_filename = os.path.join(run_folder, f"layer_plot_res={RESOLUTION}.png")
+    Visualise.show_layers(map.grid)
+
+    # Save the layer plot
+    plt.savefig(layer_plot_filename)
+    plt.close()
+    print(f"Layer plot saved as '{layer_plot_filename}'.")
+
+    # Calculate risk for each sample and save the plot
+    for i, sample in enumerate(map.samples):
+        # Calculate risk
+        risk.CalcRisk(map, (1, 1, 1), i)
+
+        # Risk plot filename
+        risk_plot_filename = os.path.join(run_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
+        Visualise.show_risks(map.grid, i)  # Show risks for the current iteration
+
+        # Save the risk plot
+        plt.savefig(risk_plot_filename)
+        plt.close()  # Close the plot to free resources for the next iteration
+
+        print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
 
     print('Done')
 

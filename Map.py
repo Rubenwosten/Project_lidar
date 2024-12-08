@@ -219,7 +219,7 @@ class Map:
         """
         # Append the resolution value to the filename
         resolution = self.grid.res
-        filename = f"{base_filename}_res={resolution}"
+        filename = f"{base_filename} res={resolution}"
 
         # Check if the file with the specific resolution exists
         if os.path.exists(filename):

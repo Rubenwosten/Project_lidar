@@ -7,10 +7,10 @@ from Severity import severity
 
 
 LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 2 # meter
+RESOLUTION = 10 # meter
 
-dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 map_name = 'boston-seaport' #'singapore-onenorth'
 
 map_width = 2979.5
@@ -34,11 +34,11 @@ if os.path.exists(filename):
     risk = Risk()
 
     # Create a folder to save the plots if it doesn't already exist
-    plots_folder = f"plots {filename}"  # Include resolution in the plot folder name
-    os.makedirs(plots_folder, exist_ok=True)
+    run_folder = f"run {filename}"  # Include resolution in the plot folder name
+    os.makedirs(run_folder, exist_ok=True)
 
     # Layer plot filename
-    layer_plot_filename = os.path.join(plots_folder, f"layer_plot_res={RESOLUTION}.png")
+    layer_plot_filename = os.path.join(run_folder, f"layer_plot_res={RESOLUTION}.png")
     Visualise.show_layers(map.grid)
 
     # Save the layer plot
@@ -52,7 +52,7 @@ if os.path.exists(filename):
         risk.CalcRisk(map, (1, 1, 1), i)
 
         # Risk plot filename
-        risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
+        risk_plot_filename = os.path.join(run_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
         Visualise.show_risks(map.grid, i)  # Show risks for the current iteration
 
         # Save the risk plot
