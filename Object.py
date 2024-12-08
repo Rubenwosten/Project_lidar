@@ -23,14 +23,19 @@ import torch
 
 num_of_modes = 5
 lengte = 24
+width = 101
+length = 84
 
 class Object:
     def __init__(self,reso, map ):
         #data object
         self._sample = None
+        self._x= None
+        self._y = None
         self.oud = None
         self.map = map
-
+        self.xmin =595
+        self.ymin =1569
 
         
         #nusc function
@@ -50,11 +55,12 @@ class Object:
         return self._sample
     
     @sample.setter
-    def sample(self, samp):
-        self._sample = samp
+    def sample(self, values):
+        self._sample,self._x, self._y = values
         if self._sample != self.oud:
             info = self.nusc.get('sample', self._sample)
             anns = info['anns']
+            print(len(anns))
             for i in range(len(anns)):
                 ans = anns[i]
                 info = self.nusc.get('sample_annotation', ans)
@@ -66,11 +72,13 @@ class Object:
                     i+=1
                 else:
                     for j in range(num_of_modes):
-                            box = self.bounding_box(info['size'], rot, int(gespl[2*i][0] + info['translation'][0]), int(gespl[2*i+1][0]+ info['translation'][1]))
-                            self.risk_to_cell(box, prob)
+                            box = self.bounding_box(info['size'], rot, int(gespl[2*j][0] + info['translation'][0]), int(gespl[2*j+1][0]+ info['translation'][1]))
+                            self.risk_to_cell(box, prob, j)
+                            print("1 num of modes klaar")
+                            print (box)
                             j+=1
                     i+=1
-                self.oud = samp
+                self.oud = self._sample
         else: return
 
 
@@ -103,14 +111,16 @@ class Object:
             i +=1
         return gespilts, prob
 
-    def risk_to_cell(self, box,prob):
-            for i in range (num_of_modes):
-                j = np.min(box[:][0])
-                while j!=np.max(box[:][0]):
-                    k = np.min(box[:][1])
-                    while k!=np.max(box[:][1]):
-                        self.map.grid.get_cell(j,k).track_risk=1-prob[i]
-                        k+=self.reso
+    def risk_to_cell(self, box,prob, i):
+                j = np.min(box[:,0])
+                while j < np.max(box[:,0]):
+                    k = np.min(box[:,1])
+                    while k < np.max(box[:,1]):
+                        if (int(j-self.xmin)<0 or int(k-self.ymin)<0 or int(j-self.xmin)>=width or int(k-self.ymin)>=length):
+                            k+=self.reso
+                        else:
+                            self.map.grid.get_cell(int(j-self.xmin),int(k-self.ymin)).track_risk+=prob[i]
+                            k+=self.reso
                     j+=self.reso
     
     def bounding_box(self, size, rotation, x, y):
