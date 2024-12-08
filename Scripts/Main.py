@@ -31,6 +31,10 @@ map_name = 'boston-seaport'  #'singapore-onenorth'
 map_width = 2979.5
 map_height = 2118.1
 
+x = 600 # ego_position[0][0]
+y = 1600 # ego_position[0][1]
+ego = (x, y)
+
 scene_id = 1
 
 filename = f'boston scene {scene_id} res = {RESOLUTION}'
@@ -47,19 +51,6 @@ def main():
     # Assign layers to the grid in parallel
     map.assign_layer(new_filename, prnt=False)
 
-
-    map.assign_layer(filename, prnt=False)
-
-    # Initialize risk calculation
-    risk = Risk()
-    #obj = Object(RESOLUTION, map, dataroot)
-    #dec = Detect(map, dataroot)
-
-    # Calculate risk for each sample        
-    for i, sample in enumerate(map.samples):
-        #dec.sample = sample
-        risk.CalcRisk(map, risk_weights, i)
-
     map.save_grid(new_filename + ' data')
     
     # Create a folder to save the run and plots if it doesn't already exist
@@ -75,8 +66,6 @@ def main():
     plt.close()
     print(f"Layer plot saved as '{layer_plot_filename}'.")
 
-    # Calculate risk for each sample and save the plot
-    for i, sample in enumerate(map.samples):
     # Initialize risk calculation
     risk = Risk()
     obj = Object(RESOLUTION,map, dataroot, map_name)
@@ -91,7 +80,6 @@ def main():
         
         risk.CalcRisk(map, risk_weights, i)
         
-
         # Risk plot filename
         risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
         Visualise.show_risks(map.grid, i)  # Show risks for the current iteration
@@ -101,7 +89,8 @@ def main():
         plt.close()  # Close the plot to free resources for the next iteration
 
         print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
-
+    
+    map.save_grid(new_filename + ' data')
     print('Done')
 
 # This ensures that the code is only executed when the script is run directly

@@ -26,7 +26,7 @@ lengte = 24
 
 
 class Object:
-    def __init__(self,reso, map, dataroot, map_name, dataroot):
+    def __init__(self,reso, map, dataroot, map_name):
         #data object
         self._sample = None
         self._sampleindex = None
