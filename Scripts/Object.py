@@ -62,7 +62,7 @@ class Object:
         if self._sample != self.oud:
             info = self.nusc.get('sample', self._sample)
             anns = info['anns']
-            print(len(anns))
+            print(f'amount of object within the sample = {len(anns)}')
             for i in range(len(anns)):
                 ans = anns[i]
                 info = self.nusc.get('sample_annotation', ans)
@@ -122,6 +122,7 @@ class Object:
                             k+=self.reso
                             
                         else:
+                            print(f'prob[i] = {prob[i]} for cell at x = {int(j-self.xmin)} \ty = {int(k-self.ymin)}')
                             self.map.grid.get_cell(int(j-self.xmin),int(k-self.ymin)).track_risk[self._sampleindex]+=prob[i]
                             k+=self.reso
                     j+=self.reso
