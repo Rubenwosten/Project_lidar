@@ -12,7 +12,7 @@ class Detect:
         self.patchymin = y
         self.oud = None
         self.dataroot = dataroot
-        self.nusc = NuScenes(version='v1.0-mini', verbose=False)
+        self.nusc = map.nusc
         self.file = None
         self.map = map
 

@@ -36,8 +36,8 @@ class Object:
         self.map = map
         self.xmin =595
         self.ymin =1569
-        self.width = self.map.width
-        self.length = self.map.length
+        self.width = self.map.map_width
+        self.length = self.map.map_height
 
         
         #nusc function

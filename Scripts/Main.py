@@ -19,7 +19,7 @@ from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
 LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 2 # meter
+RESOLUTION = 10 # meter
 
 risk_weights = (1, 1, 1) 
 #dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
@@ -74,9 +74,10 @@ def main():
     # Calculate risk for each sample
     for i in range(len(map.samples)):
         sample = map.samples[i]
-        obj.sample= (sample,x,y,i)
-        print ("sample complete")
-        #dec.sample = (sample,x,y)
+        # do the object tracking risk and object detection risk by setting the sample
+        # obj.sample= (sample,x,y,i)
+        # dec.sample = (sample,x,y)
+        print (f"sample {i} complete")
         
         risk.CalcRisk(map, risk_weights, i)
         
