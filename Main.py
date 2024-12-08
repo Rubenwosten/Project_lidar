@@ -30,6 +30,13 @@ map_name = 'boston-seaport'  #'singapore-onenorth'
 map_width = 2979.5
 map_height = 2118.1
 
+<<<<<<< HEAD
+x = 600 # ego_position[0][0]
+y = 1600 # ego_position[0][1]
+ego = (x, y)
+
+=======
+>>>>>>> c8b0d3b355fa9ba76105a557e0a3ad612157d055
 scene_id = 1
 
 filename = 'boston scene 1'
@@ -44,13 +51,17 @@ def main():
     # Initialize risk calculation
     risk = Risk()
     obj = Object(RESOLUTION,map)
-    dec = Detect(map, dataroot)
+    dec = Detect(map, dataroot,x,y)
 
-    # Calculate risk for each sample        
-    for i, sample in enumerate(map.samples):
-        dec.sample = sample
-        risk.CalcRisk(map, risk_weights, i)
-        print ("sample complete ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja ja")
+    # Calculate risk for each sample
+    sample = map.samples[4]
+    obj.sample= (sample,x,y)
+    print ("sample complete")
+        #dec.sample = (sample,x,y)
+        
+    risk.CalcRisk(map, risk_weights)
+        
+        
 
     map.save_grid(filename)
     

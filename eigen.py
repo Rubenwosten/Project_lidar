@@ -119,7 +119,6 @@ with open(file, "rb") as f:
             y = np.frombuffer(number, dtype=np.float32)
             lidar_punt += 1
         number = f.read(4)
-        print (number)
         som +=1
 print (som)
 
@@ -131,9 +130,9 @@ dt_rad = dt/180
 x= 0
 reso = 1
 theta = 0
-riskcones = np.empty(360/dt)
+riskcones = np.empty(int(360/dt))
 total_risk = 0
-for i in range(360/dt):
+for i in range(int(60/dt)):
     while x < R:
         if (theta>= -0.5*np.pi and theta<0.5*np.pi):
             a= 1
@@ -151,8 +150,9 @@ for i in range(360/dt):
             riskcones[i] += risk
             total_risk += risk
 
-for i in range(len(riskcones)):
-    
 
+verhouding = riskcones*1080/(total_risk)
+freq = 10/verhouding
+print (freq)
 
     
