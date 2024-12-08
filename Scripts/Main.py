@@ -75,8 +75,8 @@ def main():
     for i in range(len(map.samples)):
         sample = map.samples[i]
         # do the object tracking risk and object detection risk by setting the sample
-        # obj.sample= (sample,x,y,i)
-        # dec.sample = (sample,x,y)
+        obj.sample= (sample,x,y,i)
+        dec.sample = (sample,x,y)
         print (f"sample {i} complete")
         
         risk.CalcRisk(map, risk_weights, i)

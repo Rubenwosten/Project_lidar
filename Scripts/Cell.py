@@ -19,7 +19,7 @@ class Cell:
             layers = {}
         self.x = x
         self.y = y
-        self.occ = 0
+        self.occ = [0] * scene_length
         self.layers = layers
         self.layer = 'empty'
         self.total_risk = [0] * scene_length
