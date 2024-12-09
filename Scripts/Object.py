@@ -4,6 +4,7 @@ from Cell import Cell
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import tqdm
 
 from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
@@ -39,7 +40,6 @@ class Object:
         self.width = self.map.map_width
         self.length = self.map.map_height
 
-        
         #nusc function
         self.reso=reso
         self.nusc = map.nusc
@@ -73,11 +73,11 @@ class Object:
                 if np.isnan(gespl).any():
                     i +=1
                 else:
-                    for j in range(num_of_modes):
+                    for j in range(tqdm(num_of_modes)):
                             box = self.bounding_box(info['size'], rot, int(gespl[2*j][0] + info['translation'][0]), int(gespl[2*j+1][0]+ info['translation'][1]))
                             self.risk_to_cell(box, prob, j)
-                            print("1 num of modes klaar")
-                            print (box)
+                            #print("1 num of modes klaar")
+                            #print (box)
                             j+=1
                     i+=1
                 self.oud = self._sample

@@ -25,7 +25,7 @@ dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
 
-risk_weights = (1, 1, 1) 
+risk_weights = (0.5, 1, 10) 
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
@@ -79,9 +79,15 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
     for i in range(len(map.samples)):
         sample = map.samples[i]
         # do the object tracking risk and object detection risk by setting the sample
-        # obj.sample= (sample,x,y,i)
-        # dec.sample = (sample,x,y)
-        print (f"sample {i} complete")
+        # check if the tracking risk is already set, if not run the code to get the tracking risk 
+        if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
+            obj.sample= (sample,x,y,i)
+
+        # check if the detection risk is already set, if not run the code to get the detection risk 
+        # if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
+            # dec.sample = (sample,x,y)
+
+        print(f"sample {i} complete")
         
         risk.CalcRisk(map, risk_weights, i)
         
