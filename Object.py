@@ -34,10 +34,10 @@ class Object:
         self._y = None
         self.oud = None
         self.map = map
-        self.xmin =595
-        self.ymin =1569
-        self.width = self.map.width
-        self.length = self.map.length
+        self.xmin =550
+        self.ymin =1523
+        self.width = 19
+        self.length = 17
 
         
         #nusc function
@@ -71,7 +71,7 @@ class Object:
                 gespl , prob = self.route_splitser(num_of_modes,lengte, voor)
                 j=0
                 if np.isnan(gespl).any():
-                    i+=1
+                    i +=1
                 else:
                     for j in range(num_of_modes):
                             box = self.bounding_box(info['size'], rot, int(gespl[2*j][0] + info['translation'][0]), int(gespl[2*j+1][0]+ info['translation'][1]))
@@ -113,16 +113,17 @@ class Object:
             i +=1
         return gespilts, prob
 
-    def risk_to_cell(self, box,prob, i,):
+    def risk_to_cell(self, box,prob, i):
                 j = np.min(box[:,0])
                 while j < np.max(box[:,0]):
                     k = np.min(box[:,1])
                     while k < np.max(box[:,1]):
-                        if (int(j-self.xmin)<0 or int(k-self.ymin)<0 or int(j-self.xmin)>=self.width or int(k-self.ymin)>=self.length):
+                        if (int((j-self.xmin)/self.reso)<0 or int((k-self.ymin)/self.reso)<0 or int((j-self.xmin)/self.reso)>=self.width or int((k-self.ymin)/self.reso)>=self.length):
                             k+=self.reso
-                            
+                            print("doet deze")
                         else:
-                            self.map.grid.get_cell(int(j-self.xmin),int(k-self.ymin)).track_risk[self._sampleindex]+=prob[i]
+                            print (self.map.grid.get_cell(int((j-self.xmin)/self.reso),int((k-self.ymin)/self.reso)).track_risk[self._sampleindex])
+                            self.map.grid.get_cell(int((j-self.xmin)/self.reso),int((k-self.ymin)/self.reso)).track_risk[self._sampleindex]+=prob[i]
                             k+=self.reso
                     j+=self.reso
     
