@@ -18,13 +18,14 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
+#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+#dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
 
-risk_weights = (1, 1, 1) 
-#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
-dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+risk_weights = (0.5, 1, 10) 
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
@@ -35,15 +36,16 @@ x = 600 # ego_position[0][0]
 y = 1600 # ego_position[0][1]
 ego = (x, y)
 
-scene_id = 1
-
 filename = 'boston scene'
 
-def main(filename, scene_id, LIDAR_RANGE, RESOLUTION):
-    filename = f'{filename} {scene_id} res = {RESOLUTION}'
+resolutions = [1]
+scene_id = 1
+
+def main(filename, id, LIDAR_RANGE, RESOLUTION):
+    filename = f'{filename} {id} res = {RESOLUTION}'
 
     print("Starting main function...")  # Debugging line
-    map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
+    map = Map(dataroot, map_name, map_width, map_height, id, LIDAR_RANGE, RESOLUTION)
 
     # Create a folder to save the run and plots if it doesn't already exist
     run_folder = f"run {filename}"  # Include resolution in the plot folder name
@@ -71,15 +73,21 @@ def main(filename, scene_id, LIDAR_RANGE, RESOLUTION):
     # Initialize risk calculation
     risk = Risk()
     obj = Object(RESOLUTION,map, dataroot, map_name)
-    dec = Detect(map, dataroot, x, y)
+    dec = Detect(map, dataroot)
 
     # Calculate risk for each sample
     for i in range(len(map.samples)):
         sample = map.samples[i]
         # do the object tracking risk and object detection risk by setting the sample
-        obj.sample= (sample,x,y,i)
-        # dec.sample = (sample,x,y)
-        print (f"sample {i} complete")
+        # check if the tracking risk is already set, if not run the code to get the tracking risk 
+        if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
+            obj.sample= (sample,x,y,i)
+
+        # check if the detection risk is already set, if not run the code to get the detection risk 
+        # if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
+            # dec.sample = (sample,x,y)
+
+        print(f"sample {i} complete")
         
         risk.CalcRisk(map, risk_weights, i)
         
@@ -96,10 +104,9 @@ def main(filename, scene_id, LIDAR_RANGE, RESOLUTION):
     map.save_grid(new_filename + ' data')
     print('Done')
 
-resolutions = [1]
 
 # This ensures that the code is only executed when the script is run directly
 if __name__ == '__main__':
     print("Running as main module...")  # Debugging line
     for res in resolutions:
-        main(filename = 'boston scene', scene_id=0, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res)
+        main(filename = 'boston scene', id=scene_id, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res)

@@ -4,7 +4,7 @@ import os
 
 
 class Detect:
-    def __init__(self, map, dataroot,x,y):
+    def __init__(self, map, dataroot):
         self._sample=None
         self._x = None
         self._y = None
