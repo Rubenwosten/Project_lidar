@@ -259,7 +259,6 @@ class Map:
     def load_grid(self, filename):
         with open(filename, 'rb') as f:
             grid_dict = pickle.load(f)  # Load the dictionary from the file
-            # print(f'{filename} lidar aantal: {grid_dict['lidar aantal']}' )
             self.grid = Grid.from_dict(grid_dict)
             return self.grid # Reconstruct the grid from the dictionary
 

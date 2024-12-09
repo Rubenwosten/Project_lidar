@@ -27,7 +27,7 @@ map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESO
 
 scene_ids = [0,1,2,3,4,5]
 resolutions = [10, 5, 2, 1]
-
+''' 
 def add_lidar_aantal_to_saved_grid(filename):
     """
     Add a new field 'lidar_aantal' to each cell in a saved grid dictionary.
@@ -62,7 +62,7 @@ for scene_id in scene_ids:
 
             print(f"for file: {filepath} lidar_aantal = {map.grid.grid[0][0].lidar_aantal}")
         
-'''     
+    
 
 map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, 1)
 filepath = os.path.join(f'run boston scene {1} res = {1}', f'boston scene {1} res = {1} data')
