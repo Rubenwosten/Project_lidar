@@ -34,17 +34,10 @@ class Object:
         self._y = None
         self.oud = None
         self.map = map
-<<<<<<< HEAD:Object.py
         self.xmin =550
         self.ymin =1523
-        self.width = 19
-        self.length = 17
-=======
-        self.xmin =595
-        self.ymin =1569
         self.width = self.map.map_width
         self.length = self.map.map_height
->>>>>>> 67ad93406f9b544694adbbadce83d2e012a6b87b:Scripts/Object.py
 
         
         #nusc function
@@ -129,13 +122,7 @@ class Object:
                             k+=self.reso
                             print("doet deze")
                         else:
-<<<<<<< HEAD:Object.py
-                            print (self.map.grid.get_cell(int((j-self.xmin)/self.reso),int((k-self.ymin)/self.reso)).track_risk[self._sampleindex])
                             self.map.grid.get_cell(int((j-self.xmin)/self.reso),int((k-self.ymin)/self.reso)).track_risk[self._sampleindex]+=prob[i]
-=======
-                            print(f'prob[i] = {prob[i]} for cell at x = {int(j-self.xmin)} \ty = {int(k-self.ymin)}')
-                            self.map.grid.get_cell(int(j-self.xmin),int(k-self.ymin)).track_risk[self._sampleindex]+=prob[i]
->>>>>>> 67ad93406f9b544694adbbadce83d2e012a6b87b:Scripts/Object.py
                             k+=self.reso
                     j+=self.reso
     

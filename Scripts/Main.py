@@ -22,9 +22,9 @@ LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
 
 risk_weights = (1, 1, 1) 
-#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
@@ -77,7 +77,7 @@ def main(filename, scene_id, LIDAR_RANGE, RESOLUTION):
     for i in range(len(map.samples)):
         sample = map.samples[i]
         # do the object tracking risk and object detection risk by setting the sample
-        # obj.sample= (sample,x,y,i)
+        obj.sample= (sample,x,y,i)
         # dec.sample = (sample,x,y)
         print (f"sample {i} complete")
         
