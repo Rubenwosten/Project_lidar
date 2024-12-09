@@ -18,9 +18,9 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
@@ -73,13 +73,13 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
     # Initialize risk calculation
     risk = Risk()
     obj = Object(RESOLUTION,map, dataroot, map_name)
-    dec = Detect(map, dataroot, x, y)
+    dec = Detect(map, dataroot)
 
     # Calculate risk for each sample
     for i in range(len(map.samples)):
         sample = map.samples[i]
         # do the object tracking risk and object detection risk by setting the sample
-        obj.sample= (sample,x,y,i)
+        # obj.sample= (sample,x,y,i)
         # dec.sample = (sample,x,y)
         print (f"sample {i} complete")
         
@@ -103,4 +103,4 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
 if __name__ == '__main__':
     print("Running as main module...")  # Debugging line
     for res in resolutions:
-        main(filename = 'boston scene', scene_id=scene_id, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res)
+        main(filename = 'boston scene', id=scene_id, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res)

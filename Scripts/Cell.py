@@ -87,7 +87,7 @@ class Cell:
             'layer': self.layer,
             'isscanned': self.isscanned,
             'ofinterest': self.ofinterest,
-            'lidar aantal': self.lidar_aantal
+            'lidar_aantal': self.lidar_aantal
         }
 
     @staticmethod
@@ -114,7 +114,7 @@ class Cell:
         cell.layer = cell_dict['layer']
         cell.isscanned = cell_dict['isscanned']
         cell.ofinterest = cell_dict['ofinterest']
-        cell.lidar_aantal = cell_dict['lidar aantal']
+        cell.lidar_aantal = cell_dict['lidar_aantal']
         return cell
 
 
