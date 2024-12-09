@@ -34,8 +34,8 @@ class Object:
         self._y = None
         self.oud = None
         self.map = map
-        self.xmin =550
-        self.ymin =1523
+        self.xmin =map.patch[0]
+        self.ymin =map.patch[2]
         self.width = self.map.map_width
         self.length = self.map.map_height
 

@@ -8,8 +8,8 @@ class Detect:
         self._sample=None
         self._x = None
         self._y = None
-        self.patchxmin = x
-        self.patchymin = y
+        self.patchxmin = map.patch[0]
+        self.patchymin = map.patch[2]
         self.oud = None
         self.dataroot = dataroot
         self.nusc = map.nusc
@@ -51,7 +51,7 @@ class Detect:
                 elif rem ==1:
                     y = np.frombuffer(number, dtype=np.float32)
                     lidar_punt += 1
-                    self.map.grid.get_cell(int(x+self._x-595),int(y+self._y-1568)).lidar_aantal +=1
+                    self.map.grid.get_cell(int(x+self._x-self.patchxmin),int(y+self._y-self.patchymin)).lidar_aantal +=1
                 number = f.read(4) #leest de volgende bit
                 print(number)
                 print(lidar_punt)

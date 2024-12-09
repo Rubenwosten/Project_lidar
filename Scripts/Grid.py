@@ -4,7 +4,7 @@ import numpy as np
 
 class Grid:
 
-    def __init__(self, patch, resolution, scene_length):
+    def __init__(self, patch, resolution, scene_length, prnt=False):
         self.patch = patch 
         x_min, x_max , y_min, y_max = patch
         self.res = resolution
@@ -17,7 +17,8 @@ class Grid:
         self.grid = [[Cell(self.xarray[x], self.yarray[y], scene_length) for y in range(self.length)] for x in range(self.width)]
 
         self.has_assigned_layers = False
-        print('grid of width {} and length {} was created with {} elements'.format(self.width, self.length, self.width * self.length))
+        if prnt:
+            print('grid of width {} and length {} was created with {} elements'.format(self.width, self.length, self.width * self.length))
         
     def get_cell(self, x, y):
         if 0 <= x < self.width and 0 <= y < self.length:

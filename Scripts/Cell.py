@@ -28,6 +28,7 @@ class Cell:
         self.track_risk = [0] * scene_length
         self.isscanned = False
         self.ofinterest = 0
+        self.lidar_aantal = [0] * scene_length
 
     def assign_layer(self, prnt = False):
         if(prnt):
@@ -85,7 +86,8 @@ class Cell:
             'layers': self.layers,
             'layer': self.layer,
             'isscanned': self.isscanned,
-            'ofinterest': self.ofinterest
+            'ofinterest': self.ofinterest,
+            'lidar aantal': self.lidar_aantal
         }
 
     @staticmethod
@@ -112,6 +114,7 @@ class Cell:
         cell.layer = cell_dict['layer']
         cell.isscanned = cell_dict['isscanned']
         cell.ofinterest = cell_dict['ofinterest']
+        #cell.lidar_aantal = cell_dict['lidar aantal']
         return cell
 
 

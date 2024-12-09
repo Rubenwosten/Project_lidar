@@ -26,7 +26,7 @@ def assign_layer_task(x, nusc_map, rec, grid, prnt=False):
 
 class Map:
 
-    def __init__(self, dataroot, map_name, map_width, map_height, scene_id, RANGE, RES) -> None:
+    def __init__(self, dataroot, map_name, map_width, map_height, scene_id, RANGE, RES, prnt=False) -> None:
         # get the correct nuscenes object
         self.nusc = NuScenes(version='v1.0-mini', dataroot=dataroot, verbose=False)
 
@@ -46,8 +46,9 @@ class Map:
 
         # make a patch based on the min and max of the coordinates plus the range of the lidar
         self.patch = self.get_patch(self.ego_positions, RANGE)
-        print(f'ego patch = {self.get_patch(self.ego_positions, 0)}')
-        print('patch = {}'.format(self.patch))
+        if prnt:
+            print(f'ego patch = {self.get_patch(self.ego_positions, 0)}')
+            print('patch = {}'.format(self.patch))
 
         #TODO add a bit of code that checks if the grid is saved, if so load up the grid
 
@@ -258,6 +259,7 @@ class Map:
     def load_grid(self, filename):
         with open(filename, 'rb') as f:
             grid_dict = pickle.load(f)  # Load the dictionary from the file
+            # print(f'{filename} lidar aantal: {grid_dict['lidar aantal']}' )
             self.grid = Grid.from_dict(grid_dict)
             return self.grid # Reconstruct the grid from the dictionary
 
