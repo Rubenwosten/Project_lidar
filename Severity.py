@@ -1,10 +1,23 @@
+import numpy as np
 from nuscenes import NuScenes
 from Object import Object
 
 
 # this class designates a severity function according to identified objects and their orientation
 class severity:
-    def factor(traffic_participant, orientation, ego_orientation): 
+
+    def orientation_assign(angle):
+        if 315<= angle or angle < 45 :
+            return "front"
+        elif 45 <= angle < 135: 
+            return "side"
+        elif 135 <= angle < 225:
+            return "rear"
+        elif 225 <= angle <315:
+            return "side"
+
+
+    def factor(traffic_participant, participant_facing, participant_position, ego_facing, self_x, self_y): 
         traffic_participant_f = {       #the dictionary which defines severity factor according to traffic participant
         "human.pedestrian.adult": {
             "score": 0.843333333,       #the factor based on category
@@ -94,6 +107,25 @@ class severity:
             "rear": 1
         }
     
+
+        #evaluating the orientations of both vehicles
+        participant_x, participant_y = participant_position
+        v_e_p= np.array([participant_x - self_x, participant_y - self_y])
+        uv= v_e_p / np.linalg.norm (v_e_p)
+
+
+        ego_angle = np.arccos(np.dot(ego_facing, uv))
+        ego_orientation= severity.orientation_assign(ego_angle)
+
+        participant_angle = np.arccos(np.dot(participant_facing, -uv))
+        orientation = severity.orientation_assign(participant_angle)
+            
+        
+        
+        
+
+
+
         #extracting all values according to the traffic participant
         participant_score= traffic_participant_f[traffic_participant]["score"]
         io=traffic_participant_f[traffic_participant]["orientation"]

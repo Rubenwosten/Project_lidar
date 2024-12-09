@@ -1,5 +1,6 @@
 from nuscenes.nuscenes import NuScenes 
 from Cell import Cell
+from Severity import severity
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,6 +31,8 @@ class Object:
         self._sample = None
         self.oud = None
         self.map = map
+        self._x = None
+        self._y = None
 
 
         
@@ -50,8 +53,8 @@ class Object:
         return self._sample
     
     @sample.setter
-    def sample(self, samp):
-        self._sample = samp
+    def sample(self, values):
+        self._sample, self._x, self._y = values
         if self._sample != self.oud:
             info = self.nusc.get('sample', self._sample)
             anns = info['anns']
@@ -59,6 +62,7 @@ class Object:
                 ans = anns[i]
                 info = self.nusc.get('sample_annotation', ans)
                 rot = np.arctan2((2*(info['rotation'][0]*info['rotation'][3]+info['rotation'][1]*info['rotation'][2])),(1-2*(info['rotation'][3]**2+info['rotation'][2]**2)))
+                sev = severity.factor(info['category'], rot, info['translation'], self._x, self._y)
                 voor = self.voorspelling(info['instance_token'])
                 gespl , prob = self.route_splitser(num_of_modes,lengte, voor)
                 j=0
@@ -70,7 +74,7 @@ class Object:
                             self.risk_to_cell(box, prob)
                             j+=1
                     i+=1
-                self.oud = samp
+                self.oud = self._sample
         else: return
 
 
