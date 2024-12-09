@@ -4,6 +4,8 @@ from Cell import Cell
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from Severity import severity
+
 
 from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils

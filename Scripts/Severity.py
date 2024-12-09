@@ -1,6 +1,6 @@
 import numpy as np
 from nuscenes import NuScenes
-from Object import Object
+
 
 
 # this class designates a severity function according to identified objects and their orientation
@@ -101,7 +101,7 @@ class severity:
             "rear": 0.9
         }
 
-        ego_orientation_f={
+        ego_orientation_f={         # the orientation factor of the ego vegicle
             "front": 2,
             "side": 1.5,
             "rear": 1
