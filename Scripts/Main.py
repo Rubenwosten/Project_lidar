@@ -75,17 +75,23 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
     # Calculate risk for each sample
     for i, sample in enumerate(map.samples):
         # do the object tracking risk and object detection risk by setting the sample
+        
         # check if the tracking risk is already set, if not run the code to get the tracking risk 
         #if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
             #obj.sample= (sample,x,y,i)
+        #else:
+        #    print('Tracking risk was already set, skipping the tracking risk calculations')
 
+        dec.sample = (sample, i)
         #check if the detection risk is already set, if not run the code to get the detection risk 
         if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            dec.sample = (sample, i)
+            continue
+        else:
+            print('Detection risk was already set, skipping the detection risk calculations')
 
         print(f"sample {i} complete")
         
-        risk.CalcRisk(map, risk_weights, i)
+        risk.CalcRisk(map, risk_weights, i) 
         
         # Risk plot filename
         risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")

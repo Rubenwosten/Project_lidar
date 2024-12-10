@@ -87,22 +87,14 @@ class Detect:
                 if self._sampleindex == 0:
                     occ = cell.occ[self._sampleindex]
                 else: 
-                    occ = cell.occ[self._sampleindex-1]    
+                    occ = cell.occ[self._sampleindex-1]
                 
-                if lidar_punten < 5:
-                    occ += 0.5 - 0.1*lidar_punten
-                    if occ > 1:
-                        occ = 1
-                    else: occ = occ
-                else:
-                    occ -= 0.05*lidar_punten
-                    if occ < 0:
-                        occ = 0
-                    else: occ = occ
+                occ += 0.125 # standard occurence accumulation
+                occ = max(0, min(occ - 0.1 * lidar_punten, 1))
                 
                 cell.occ[self._sampleindex] = occ
-                if lidar_punten > 1:
-                    print (f"werkt zeer goed {lidar_punten} occ = {occ} cell occ = {cell.occ[self._sampleindex]}")
+                # if lidar_punten > 1:
+                    #print (f"werkt zeer goed {lidar_punten} occ = {occ} cell occ = {cell.occ[self._sampleindex]}")
 
     def update_risk(self):
         for row in self.map.grid.grid:
