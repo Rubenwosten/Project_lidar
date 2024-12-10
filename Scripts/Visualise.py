@@ -106,6 +106,51 @@ class Visualise:
         print('Risk grid visualization complete.')
     
     @staticmethod
+    def show_risks(grid, index, max_total, max_static, max_detect, max_track):
+        """
+        Displays a 2x2 subplot grid for risk matrices: Total Risk, Static Risk, Detect Risk, and Track Risk.
+
+        :param grid: The grid object that holds the risk matrices.
+        :param index: The index for the sample (used for dynamic risk calculations).
+        """
+        # Get matrices
+        total_risk_matrix = np.transpose(grid.get_total_risk_matrix(index))
+        static_risk_matrix = np.transpose(grid.get_static_risk_matrix())
+        detect_risk_matrix = np.transpose(grid.get_detect_risk_matrix(index))
+        track_risk_matrix = np.transpose(grid.get_track_risk_matrix(index))
+
+        # Define the figure and 2x2 subplot layout
+        fig, axes = plt.subplots(2, 2, figsize=(12, 10))  # Adjusted figure size
+        axes = axes.flatten()  # Flatten the 2x2 grid into a 1D array for easy iteration
+
+        # Risk matrices and titles
+        risk_matrices = {
+            "Total Risk": (total_risk_matrix, max_total),
+            "Static Risk": (static_risk_matrix, max_static),  # Assuming static risk shares max_total
+            "Detect Risk": (detect_risk_matrix, max_detect),
+            "Track Risk": (track_risk_matrix, max_track),
+        }
+
+        for i, (title, (matrix, max_value)) in enumerate(risk_matrices.items()):
+            ax = axes[i]
+            norm = Normalize(vmin=0, vmax=max_value)
+            im = ax.imshow(matrix, origin='lower', cmap='viridis', norm=norm)
+            ax.set_title(title, fontsize=12)
+
+            # Disable gridlines for each subplot
+            ax.grid(False)  # This removes the grid overlay
+
+            # Add colorbar for each subplot
+            cbar = fig.colorbar(ScalarMappable(norm=im.norm, cmap=im.cmap), ax=ax, shrink=0.8)
+            cbar.set_label(title)
+
+        # Adjust layout to avoid overlap
+        plt.tight_layout(pad=5.0)  # Increase padding between subplots for better spacing
+        #plt.show()
+
+        print('Risk grid visualization complete.')
+
+    @staticmethod
     def plot_grid(grid, index, prnt=False):
         """
         Visualizes the grid's layer and risk matrices in a combined layout:
