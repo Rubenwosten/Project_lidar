@@ -19,13 +19,15 @@ from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
 #dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
-dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
+OCC_ACCUM = 1 / 8 # full accumulation in 8 samples = 4 sec 
+LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
 
-risk_weights = (0.5, 1, 10)
+risk_weights = (0.5, 4, 10)
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
@@ -42,7 +44,7 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
     filename = f'{filename} {id} res = {RESOLUTION}'
 
     print("Starting main function...")  # Debugging line
-    map = Map(dataroot, map_name, map_width, map_height, id, LIDAR_RANGE, RESOLUTION)
+    map = Map(dataroot, map_name, map_width, map_height, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY)
 
     # Create a folder to save the run and plots if it doesn't already exist
     run_folder = f"run {filename}"  # Include resolution in the plot folder name

@@ -89,8 +89,8 @@ class Detect:
                 else: 
                     occ = cell.occ[self._sampleindex-1]
                 
-                occ += 0.125 # standard occurence accumulation
-                occ = max(0, min(occ - 0.1 * lidar_punten, 1))
+                occ += self.map.OCC_ACCUM # standard occurence accumulation
+                occ = max(0, min(occ - self.map.LIDAR_DECAY * lidar_punten, 1))
                 
                 cell.occ[self._sampleindex] = occ
                 # if lidar_punten > 1:
