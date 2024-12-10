@@ -18,6 +18,10 @@ class severity:
 
 
     def factor(traffic_participant, participant_facing, participant_position, ego_facing, self_x, self_y): 
+
+        #vehicle.car [0.9687457208122074, 0.0, 0.0, -0.24805589774894815] [587.422, 1654.32, 1.126] [0.5780193421828153, -0.002390749587151425, 0.012332644429184535, -0.8159263632585605] 600 1600
+              
+
         traffic_participant_f = {       #the dictionary which defines severity factor according to traffic participant
         "human.pedestrian.adult": {
             "score": 0.843333333,       #the factor based on category
@@ -108,16 +112,20 @@ class severity:
         }
     
 
+        #evaluating the positions of both vehicles
+        participant_x, participant_y, z = participant_position
+        v_e_p= np.array([participant_x - self_x, participant_y - self_y])   #generating a vector from ego to participant
+        uv_e_p= v_e_p / np.linalg.norm (v_e_p)                              #converting to a unit vector
+
         #evaluating the orientations of both vehicles
-        participant_x, participant_y = participant_position
-        v_e_p= np.array([participant_x - self_x, participant_y - self_y])
-        uv= v_e_p / np.linalg.norm (v_e_p)
-
-
-        ego_angle = np.arccos(np.dot(ego_facing, uv))
+        ego_facing_a = np.arctan2((2*(ego_facing[0]*ego_facing[3]+ego_facing[1]* ego_facing[2])),(1-2*(ego_facing[3]**2+ego_facing[2]**2)))
+        ego_facing_v = np.array(np.cos(ego_facing_a), np.sin(ego_facing_a))
+        ego_angle = np.arccos(np.dot(ego_facing_v, uv_e_p)[0])
         ego_orientation= severity.orientation_assign(ego_angle)
 
-        participant_angle = np.arccos(np.dot(participant_facing, -uv))
+        participant_facing_a = np.arctan2((2*(participant_facing[0]*participant_facing[3]+participant_facing[1]* participant_facing[2])),(1-2*(participant_facing[3]**2+participant_facing[2]**2)))
+        participant_facing_v = np.array(np.cos(participant_facing_a), np.sin(participant_facing_a))
+        participant_angle = np.arccos(np.dot(participant_facing_v, -uv_e_p)[0])
         orientation = severity.orientation_assign(participant_angle)
             
         
@@ -132,16 +140,15 @@ class severity:
         o_factor= orientation_f.get(orientation, 1)
         e_o_factor= ego_orientation_f.get(ego_orientation, 1)
 
-        #debug
-        print(participant_score, io, o_factor, e_o_factor)
+        
         
         #severity calculation function
         if io == 1:
             sev = participant_score * o_factor * e_o_factor
-            print(sev)
+            #print(sev)
         else:
             sev = participant_score * e_o_factor
-            print(sev)
+            #print(sev)
         return sev
 
 
