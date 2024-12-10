@@ -95,6 +95,9 @@ class Visualise:
             im = ax.imshow(matrix, origin='lower', cmap='viridis', norm=Normalize(vmin=np.min(matrix), vmax=np.max(matrix)))
             ax.set_title(title, fontsize=12)
 
+            # Disable gridlines for each subplot
+            ax.grid(False)  # This removes the grid overlay
+            
             # Add colorbar for each subplot
             cbar = fig.colorbar(ScalarMappable(norm=im.norm, cmap=im.cmap), ax=ax, shrink=0.8)
             cbar.set_label(title)
@@ -106,7 +109,7 @@ class Visualise:
         print('Risk grid visualization complete.')
     
     @staticmethod
-    def show_risks(grid, index, max_total, max_static, max_detect, max_track):
+    def show_risks_maximised(grid, index, max_total, max_static, max_detect, max_track):
         """
         Displays a 2x2 subplot grid for risk matrices: Total Risk, Static Risk, Detect Risk, and Track Risk.
 
