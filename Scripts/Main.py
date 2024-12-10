@@ -76,12 +76,11 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
     dec = Detect(map, dataroot)
 
     # Calculate risk for each sample
-    for i in range(len(map.samples)):
-        sample = map.samples[i]
+    for i, sample in enumerate(map.samples):
         # do the object tracking risk and object detection risk by setting the sample
         # check if the tracking risk is already set, if not run the code to get the tracking risk 
         if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            obj.sample= (sample,x,y,i)
+            obj.sample = (sample,x,y,i)
 
         # check if the detection risk is already set, if not run the code to get the detection risk 
         # if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
@@ -100,7 +99,27 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
         plt.close()  # Close the plot to free resources for the next iteration
 
         print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
+        
     
+    # plot all risk plots with global maximum value 
+    for i, sample in enumerate(map.samples):
+
+        # Calculate the global maximum value across all total risk matrices
+        max_total = max(np.max(np.array(matrix)) for matrix in [map.grid.get_total_risk_matrix(i) for i in range(map.grid.scene_length)])
+        max_static = np.max(np.array(map.grid.get_static_risk_matrix()))
+        max_detect = max(np.max(np.array(matrix)) for matrix in [map.grid.get_detect_risk_matrix(i) for i in range(map.grid.scene_length)])
+        max_track = max(np.max(np.array(matrix)) for matrix in [map.grid.get_track_risk_matrix(i) for i in range(map.grid.scene_length)])
+
+        risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
+        Visualise.show_risks(map.grid, i, max_total, max_static, max_detect, max_track)  # Show risks for the current iteration
+
+        # Save the risk plot
+        plt.savefig(risk_plot_filename)
+        plt.close()  # Close the plot to free resources for the next iteration
+
+        print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
+
+    # save the grid with the new risk values 
     map.save_grid(new_filename + ' data')
     print('Done')
 
