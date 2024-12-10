@@ -39,8 +39,8 @@ class Object:
         self.map = map
         self.xmin =map.patch[0]
         self.ymin =map.patch[2]
-        self.width = self.map.map_width
-        self.length = self.map.map_height
+        self.width = self.map.grid.width
+        self.length = self.map.grid.length
 
         #nusc function
         self.reso=reso
