@@ -25,7 +25,7 @@ dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
 
-risk_weights = (0.5, 1, 10) 
+risk_weights = (0.5, 1, 10)
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
