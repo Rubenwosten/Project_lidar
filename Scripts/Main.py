@@ -18,9 +18,9 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
@@ -32,9 +32,6 @@ map_name = 'boston-seaport'  #'singapore-onenorth'
 map_width = 2979.5
 map_height = 2118.1
 
-x = 600 # ego_position[0][0]
-y = 1600 # ego_position[0][1]
-ego = (x, y)
 
 filename = 'boston scene'
 
@@ -73,19 +70,19 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
     # Initialize risk calculation
     risk = Risk()
     obj = Object(RESOLUTION,map, dataroot, map_name)
-    dec = Detect(map, dataroot)
+    dec = Detect(map, dataroot, RESOLUTION)
 
     # Calculate risk for each sample
     for i in range(len(map.samples)):
         sample = map.samples[i]
         # do the object tracking risk and object detection risk by setting the sample
         # check if the tracking risk is already set, if not run the code to get the tracking risk 
-        if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            obj.sample= (sample,x,y,i)
+        #if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
+            #obj.sample= (sample,x,y,i)
 
-        # check if the detection risk is already set, if not run the code to get the detection risk 
-        # if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            # dec.sample = (sample,x,y)
+        #check if the detection risk is already set, if not run the code to get the detection risk 
+        if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
+            dec.sample = (sample, i)
 
         print(f"sample {i} complete")
         
