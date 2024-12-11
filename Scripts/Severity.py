@@ -17,7 +17,7 @@ class severity:
             return "side"
 
 
-    def factor(traffic_participant, participant_facing, participant_position, ego_facing, self_x, self_y): 
+    def factor(traffic_participant, participant_facing, participant_position, ego_facing, self_x, self_y, detected): 
 
         #vehicle.car [0.9687457208122074, 0.0, 0.0, -0.24805589774894815] [587.422, 1654.32, 1.126] [0.5780193421828153, -0.002390749587151425, 0.012332644429184535, -0.8159263632585605] 600 1600
               
@@ -123,6 +123,9 @@ class severity:
         ego_angle = np.arccos(np.dot(ego_facing_v, uv_e_p)[0])
         ego_orientation= severity.orientation_assign(ego_angle)
 
+        if detected:
+            participant_facing = (0,0,0,0)
+
         participant_facing_a = np.arctan2((2*(participant_facing[0]*participant_facing[3]+participant_facing[1]* participant_facing[2])),(1-2*(participant_facing[3]**2+participant_facing[2]**2)))
         participant_facing_v = np.array(np.cos(participant_facing_a), np.sin(participant_facing_a))
         participant_angle = np.arccos(np.dot(participant_facing_v, -uv_e_p)[0])
@@ -143,7 +146,7 @@ class severity:
         
         
         #severity calculation function
-        if io == 1:
+        if io == 1 and detected:
             sev = participant_score * o_factor * e_o_factor
             #print(sev)
         else:
