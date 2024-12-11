@@ -19,13 +19,15 @@ from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
 #dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
-dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
+OCC_ACCUM = 1 / 8 # full accumulation in 8 samples = 4 sec 
+LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
 
-risk_weights = (0.5, 1, 10)
+risk_weights = (0.5, 2, 10)
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
@@ -36,13 +38,13 @@ map_height = 2118.1
 filename = 'boston scene'
 
 resolutions = [1]
-scene_id = 1
+scene_id = 4
 
 def main(filename, id, LIDAR_RANGE, RESOLUTION):
     filename = f'{filename} {id} res = {RESOLUTION}'
 
     print("Starting main function...")  # Debugging line
-    map = Map(dataroot, map_name, map_width, map_height, id, LIDAR_RANGE, RESOLUTION)
+    map = Map(dataroot, map_name, map_width, map_height, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY)
 
     # Create a folder to save the run and plots if it doesn't already exist
     run_folder = f"run {filename}"  # Include resolution in the plot folder name
@@ -75,17 +77,22 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
     # Calculate risk for each sample
     for i, sample in enumerate(map.samples):
         # do the object tracking risk and object detection risk by setting the sample
+        
         # check if the tracking risk is already set, if not run the code to get the tracking risk 
-        #if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            #obj.sample= (sample,x,y,i)
+        if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
+            obj.sample= (sample,0,0,i)
+        else:
+            print('Tracking risk was already set, skipping the tracking risk calculations')
 
         #check if the detection risk is already set, if not run the code to get the detection risk 
         if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
             dec.sample = (sample, i)
+        else:
+            print('Detection risk was already set, skipping the detection risk calculations')
 
         print(f"sample {i} complete")
         
-        risk.CalcRisk(map, risk_weights, i)
+        risk.CalcRisk(map, risk_weights, i) 
         
         # Risk plot filename
         risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")

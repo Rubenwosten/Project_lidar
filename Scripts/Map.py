@@ -26,9 +26,12 @@ def assign_layer_task(x, nusc_map, rec, grid, prnt=False):
 
 class Map:
 
-    def __init__(self, dataroot, map_name, map_width, map_height, scene_id, RANGE, RES, prnt=False) -> None:
+    def __init__(self, dataroot, map_name, map_width, map_height, scene_id, RANGE, RES, OCC_ACCUM, LIDAR_DECAY, prnt=False) -> None:
         # get the correct nuscenes object
         self.nusc = NuScenes(version='v1.0-mini', dataroot=dataroot, verbose=False)
+
+        self.OCC_ACCUM = OCC_ACCUM
+        self.LIDAR_DECAY = LIDAR_DECAY
 
         self.nusc_map = NuScenesMap(dataroot=dataroot, map_name=map_name)
         self.bitmap = BitMap(self.nusc_map.dataroot, self.nusc_map.map_name, 'basemap')
