@@ -27,7 +27,7 @@ RESOLUTION = 10 # meter
 OCC_ACCUM = 1 / 8 # full accumulation in 8 samples = 4 sec 
 LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
 
-risk_weights = (0.5, 4, 10)
+risk_weights = (0.5, 2, 10)
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
 
@@ -38,7 +38,7 @@ map_height = 2118.1
 filename = 'boston scene'
 
 resolutions = [1]
-scene_id = 1
+scene_id = 4
 
 def main(filename, id, LIDAR_RANGE, RESOLUTION):
     filename = f'{filename} {id} res = {RESOLUTION}'
@@ -79,15 +79,14 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
         # do the object tracking risk and object detection risk by setting the sample
         
         # check if the tracking risk is already set, if not run the code to get the tracking risk 
-        #if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            #obj.sample= (sample,x,y,i)
-        #else:
-        #    print('Tracking risk was already set, skipping the tracking risk calculations')
+        if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
+            obj.sample= (sample,0,0,i)
+        else:
+            print('Tracking risk was already set, skipping the tracking risk calculations')
 
-        dec.sample = (sample, i)
         #check if the detection risk is already set, if not run the code to get the detection risk 
         if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            continue
+            dec.sample = (sample, i)
         else:
             print('Detection risk was already set, skipping the detection risk calculations')
 

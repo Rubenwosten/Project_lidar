@@ -4,7 +4,7 @@ from Cell import Cell
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-import tqdm
+from tqdm import tqdm
 from Severity import severity
 
 
@@ -65,7 +65,7 @@ class Object:
             info = self.nusc.get('sample', self._sample)
             anns = info['anns']
             print(f'amount of object within the sample = {len(anns)}')
-            for i in range(len(anns)):
+            for i in tqdm(range(len(anns))):
                 ans = anns[i]
                 info = self.nusc.get('sample_annotation', ans)
                 rot = np.arctan2((2*(info['rotation'][0]*info['rotation'][3]+info['rotation'][1]*info['rotation'][2])),(1-2*(info['rotation'][3]**2+info['rotation'][2]**2)))
@@ -76,7 +76,7 @@ class Object:
                 if np.isnan(gespl).any():
                     continue
                 else:
-                    for j in range(tqdm(num_of_modes)):
+                    for j in range(num_of_modes):
                             box = self.bounding_box(info['size'], rot, int(gespl[2*j][0] + info['translation'][0]), int(gespl[2*j+1][0]+ info['translation'][1]))
                             self.risk_to_cell(box, prob, j)
                             #print("1 num of modes klaar")
@@ -123,7 +123,6 @@ class Object:
                     while k < np.max(box[:,1]):
                         if (int((j-self.xmin)/self.reso)<0 or int((k-self.ymin)/self.reso)<0 or int((j-self.xmin)/self.reso)>=self.width or int((k-self.ymin)/self.reso)>=self.length):
                             k+=self.reso
-                            print("doet deze")
                         else:
                             self.map.grid.get_cell(int((j-self.xmin)/self.reso),int((k-self.ymin)/self.reso)).track_risk[self._sampleindex]+=prob[i]
                             k+=self.reso
