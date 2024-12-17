@@ -70,7 +70,7 @@ class Object:
                 info = self.nusc.get('sample_annotation', ans)
                 rot = np.arctan2((2*(info['rotation'][0]*info['rotation'][3]+info['rotation'][1]*info['rotation'][2])),(1-2*(info['rotation'][3]**2+info['rotation'][2]**2)))
                 voor = self.voorspelling(info['instance_token'])
-                sev = severity.factor(info['category_name'], info['rotation'], info['translation'], self.nusc.ego_pose[i]['rotation'], self._x, self._y)
+                sev = severity.factor(info['category_name'], info['rotation'], info['translation'], self.nusc.ego_pose[i]['rotation'], self._x, self._y, detected=True)
                 gespl , prob = self.route_splitser(num_of_modes,lengte, voor)
                 j=0
                 if np.isnan(gespl).any():

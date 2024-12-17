@@ -60,9 +60,8 @@ class Detect:
                 if rem == 0: # als het residu = 0 heb je het x coordinaat en res = 1 is het y-coordinaat
                     
                     x = np.frombuffer(number, dtype=np.float32)
-                    number = f.read(4) #leest de volgende bit
-                    
-                elif rem ==1:
+                    number = f.read(4) #leest de volgende bit    
+                if rem ==1:
                     np.frombuffer(number, dtype=np.float32)
                     y = np.frombuffer(number, dtype=np.float32)
                     x_frame = int((x+self._x-self.patchxmin)/self.reso)
@@ -78,6 +77,8 @@ class Detect:
                 else:
                     number = f.read(4) #leest de volgende bit
                 som +=1 # som houdt bij hoeveel items gelezen zijn.
+        print(lidar_punt)
+        print(som)
 
 
     def update_occerence(self):
@@ -108,6 +109,8 @@ class Detect:
                 
                 # Update the occurrence value for the current sample index in the cell
                 cell.occ[self._sampleindex] = occ
+<<<<<<< HEAD
+=======
                 
                 # Debugging statement (currently commented out):
                 # If lidar points exceed 1, print the occurrence value for debugging purposes.
@@ -115,6 +118,7 @@ class Detect:
                 #     print(f"werkt zeer goed {lidar_punten} occ = {occ} cell occ = {cell.occ[self._sampleindex]}")
 
 
+>>>>>>> d134c78f3cf8db02888318843680974f3062b844
     def update_risk(self):
         for row in self.map.grid.grid:
             for cell in row:
