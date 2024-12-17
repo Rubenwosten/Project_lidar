@@ -25,8 +25,8 @@ scene_id = 1
 
 map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
 
-scene_ids = [0,1,2,3,4,5]
-resolutions = [10,5,2,1]
+scene_ids = [1]
+resolutions = [1]
 ''' 
 def add_lidar_aantal_to_saved_grid(filename):
     """
@@ -51,7 +51,7 @@ def add_lidar_aantal_to_saved_grid(filename):
         pickle.dump(grid_dict, outfile)
 
     print(f"Updated grid with 'lidar_aantal' saved to {filename}")
-
+'''
 for scene_id in scene_ids:
     for res in resolutions:
         filepath = os.path.join(f'run boston scene {scene_id} res = {res}', f'boston scene {scene_id} res = {res} data')
@@ -60,7 +60,7 @@ for scene_id in scene_ids:
 
             map.load_grid(filepath) 
 
-            print(f"for file: {filepath} lidar_aantal = {map.grid.grid[0][0].lidar_aantal}")
+            
         else:
             print(f'filepath {filepath} does not exist...')
 
@@ -70,7 +70,7 @@ filepath = os.path.join(f'run boston scene {1} res = {1}', f'boston scene {1} re
 map.grid = map.load_grid(filepath)
 
 
-filepaths = [f'run boston scene {scene_id} res = {res}'}
+filepaths = f'run boston scene {scene_id} res = {res}'
 
 for filepath in filepaths:
     map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
@@ -82,7 +82,7 @@ scene_id = 2
 map.load_grid(os.path.join(f'run boston scene {scene_id} res = {res}',f'boston scene {scene_id} res = {res} data'))
 
 print(map.grid.count_layers()) 
-'''
+
 
 
 
