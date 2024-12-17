@@ -48,6 +48,8 @@ class Cell:
         for layer_name in Cell.priority_layers:
             if layer_name in self.layers:
                 self.layer = layer_name
+                if(self.layer != 'empty'):
+                    self.occ = [1] * len(self.total_risk)
                 break
 
         # Calculate the static risk as the sum of severity scores for all layers in self.layers
