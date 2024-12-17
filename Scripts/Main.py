@@ -80,8 +80,8 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
             #obj.sample= (sample,x,y,i)
 
         #check if the detection risk is already set, if not run the code to get the detection risk 
-        if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            dec.sample = (sample, i)
+        #if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
+        dec.sample = (sample, i)
 
         print(f"sample {i} complete")
         
@@ -89,7 +89,7 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
         
         # Risk plot filename
         risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
-        Visualise.show_risks(map.grid, i)  # Show risks for the current iteration
+        #Visualise.show_risks(map.grid, i)  # Show risks for the current iteration
 
         # Save the risk plot
         plt.savefig(risk_plot_filename)
