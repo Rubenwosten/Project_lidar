@@ -85,15 +85,8 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
             print('Tracking risk was already set, skipping the tracking risk calculations')
 
         #check if the detection risk is already set, if not run the code to get the detection risk 
-<<<<<<< HEAD
         #if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
         dec.sample = (sample, i)
-=======
-        if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            dec.sample = (sample, i)
-        else:
-            print('Detection risk was already set, skipping the detection risk calculations')
->>>>>>> 2387e5bc55013ab6862b48adc6dd443207b42c3f
 
         print(f"sample {i} complete")
         
