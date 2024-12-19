@@ -78,7 +78,7 @@ class Object:
                 else:
                     for j in range(num_of_modes):
                             box = self.bounding_box(info['size'], rot, int(gespl[2*j][0] + info['translation'][0]), int(gespl[2*j+1][0]+ info['translation'][1]))
-                            self.risk_to_cell(box, prob, j)
+                            self.risk_to_cell(box, prob, j, sev)
                             #print("1 num of modes klaar")
                             #print (box)
                             continue
@@ -116,7 +116,7 @@ class Object:
             i +=1
         return gespilts, prob
 
-    def risk_to_cell(self, box,prob, i):
+    def risk_to_cell(self, box,prob, i, sev):
                 j = np.min(box[:,0])
                 while j < np.max(box[:,0]):
                     k = np.min(box[:,1])
@@ -124,7 +124,7 @@ class Object:
                         if (int((j-self.xmin)/self.reso)<0 or int((k-self.ymin)/self.reso)<0 or int((j-self.xmin)/self.reso)>=self.width or int((k-self.ymin)/self.reso)>=self.length):
                             k+=self.reso
                         else:
-                            self.map.grid.get_cell(int((j-self.xmin)/self.reso),int((k-self.ymin)/self.reso)).track_risk[self._sampleindex]+=prob[i]
+                            self.map.grid.get_cell(int((j-self.xmin)/self.reso),int((k-self.ymin)/self.reso)).track_risk[self._sampleindex]+=prob[i] * sev
                             k+=self.reso
                     j+=self.reso
     
