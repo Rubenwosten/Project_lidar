@@ -18,6 +18,7 @@ class Detect:
         self._sampleindex = None
         self.ego = self.map.ego_positions
         self.reso = reso
+        self.lidarpoint = []
         self.width = self.map.grid.width
         self.length = self.map.grid.length
 
@@ -30,13 +31,17 @@ class Detect:
         self._sample, self._sampleindex = values
         self._x = self.ego[self._sampleindex][0]
         self._y = self.ego[self._sampleindex][1]
+        
         if self._sample != self.oud: # alleen runnen als sample veranderd
+            self.lidarpoint = []
             self.file_get()
             print ("file complete")
             self.lidar_coor()
             print("lidar complete")
             self.update_occerence()
             self.update_risk()
+            print(self.lidarpoint[1][1])
+            print(self.lidarpoint[1][0])
             self.oud = self._sample # sample is helemaal gerund dus dit is de stopconditie
         else: return
 
@@ -67,6 +72,8 @@ class Detect:
                     x_frame = int((x+self._x-self.patchxmin)/self.reso)
                     y_frame = int((y+self._y-self.patchymin)/self.reso)
                     lidar_punt += 1
+                    
+                    self.lidarpoint.append((x+self._x,y+self._y))
                     
                     
                     if (x_frame<0 or y_frame<0 or x_frame>= self.width or y_frame>=self.length):
@@ -109,16 +116,6 @@ class Detect:
                 
                 # Update the occurrence value for the current sample index in the cell
                 cell.occ[self._sampleindex] = occ
-<<<<<<< HEAD
-=======
-                
-                # Debugging statement (currently commented out):
-                # If lidar points exceed 1, print the occurrence value for debugging purposes.
-                # if lidar_punten > 1:
-                #     print(f"werkt zeer goed {lidar_punten} occ = {occ} cell occ = {cell.occ[self._sampleindex]}")
-
-
->>>>>>> d134c78f3cf8db02888318843680974f3062b844
     def update_risk(self):
         for row in self.map.grid.grid:
             for cell in row:

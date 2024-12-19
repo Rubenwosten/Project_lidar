@@ -40,12 +40,19 @@ class power:
     @sample.setter
     def sample(self, values):
         self._sample, self._sampleindex = values
+        cones = self.assign_cell_to_cone()
+        for cone in enumerate(cones):
+            for cell in cone:
+                
+
+
+
 
     def cones (self):
         angle_step = 360 / self.n_cones
         quadrants = [(i * angle_step, (i + 1) * angle_step) for i in range(self.n_cones)]
         return quadrants
-    
+
     def get_angle_and_distance(self, cell):
         ego_pos = self.ego[self._sampleindex]
         x,y = cell
