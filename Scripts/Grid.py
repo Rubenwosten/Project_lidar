@@ -1,6 +1,7 @@
 # This class creates a grid 
 from Cell import Cell
 import numpy as np
+import math
 
 class Grid:
 
@@ -71,6 +72,15 @@ class Grid:
             'grid': [[cell.to_dict() for cell in row] for row in self.grid],  # Convert all cells to dictionaries
             'has_assigned_layers': self.has_assigned_layers
         }
+    def circle_of_interrest(self, range, ego):
+        circle_interrest = []
+        for row in self.grid:
+            for cell in row:
+                x= cell.x
+                y= cell.y
+                distance = math.sqrt((y-ego[1])**2 + (x-ego[0])**2)
+                if distance < range:
+                    circle_interrest.append(cell)
 
 
     @staticmethod
