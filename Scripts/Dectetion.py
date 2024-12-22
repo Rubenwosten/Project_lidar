@@ -109,16 +109,8 @@ class Detect:
                 
                 # Update the occurrence value for the current sample index in the cell
                 cell.occ[self._sampleindex] = occ
-<<<<<<< HEAD
-=======
-                
-                # Debugging statement (currently commented out):
-                # If lidar points exceed 1, print the occurrence value for debugging purposes.
-                # if lidar_punten > 1:
-                #     print(f"werkt zeer goed {lidar_punten} occ = {occ} cell occ = {cell.occ[self._sampleindex]}")
 
-
->>>>>>> d134c78f3cf8db02888318843680974f3062b844
+    
     def update_risk(self):
         for row in self.map.grid.grid:
             for cell in row:

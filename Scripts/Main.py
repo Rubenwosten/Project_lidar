@@ -40,7 +40,7 @@ filename = 'boston scene'
 resolutions = [1]
 scene_id = 4
 
-def main(filename, id, LIDAR_RANGE, RESOLUTION):
+def main(filename, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
     filename = f'{filename} {id} res = {RESOLUTION}'
 
     print("Starting main function...")  # Debugging line
@@ -132,4 +132,4 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION):
 if __name__ == '__main__':
     print("Running as main module...")  # Debugging line
     for res in resolutions:
-        main(filename = 'boston scene', id=scene_id, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res)
+        main(filename = 'boston scene', id=scene_id, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res, OCC_ACCUM=OCC_ACCUM, LIDAR_DECAY=LIDAR_DECAY)
