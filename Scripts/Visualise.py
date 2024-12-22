@@ -106,7 +106,7 @@ class Visualise:
         plt.tight_layout(pad=5.0)  # Increase padding between subplots for better spacing
         #plt.show()
 
-        print('Risk grid visualization complete.')
+        #print('Risk grid visualization complete.')
     
     @staticmethod
     def show_risks_maximised(grid, index, max_total, max_static, max_detect, max_track):
@@ -151,7 +151,7 @@ class Visualise:
         plt.tight_layout(pad=5.0)  # Increase padding between subplots for better spacing
         #plt.show()
 
-        print('Risk grid visualization complete.')
+        #print('Risk grid visualization complete.')
 
     @staticmethod
     def plot_grid(grid, index, prnt=False):

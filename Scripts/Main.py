@@ -18,56 +18,58 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
-LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 10 # meter
+LIDAR_RANGE = 100 # 100 meter
 OCC_ACCUM = 1 / 8 # full accumulation in 8 samples = 4 sec 
 LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
 
 risk_weights = (0.5, 2, 10)
 
 map_name = 'boston-seaport'  #'singapore-onenorth'
+map_short = 'Boston'
 
 map_width = 2979.5
 map_height = 2118.1
 
+scene_id = 1
+RESOLUTION = 2 # meter
 
-filename = 'boston scene'
+def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
-resolutions = [1]
-scene_id = 4
-
-def main(filename, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
-    filename = f'{filename} {id} res = {RESOLUTION}'
-
-    print("Starting main function...")  # Debugging line
+    print("Starting main function...")
     map = Map(dataroot, map_name, map_width, map_height, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY)
 
     # Create a folder to save the run and plots if it doesn't already exist
-    run_folder = f"run {filename}"  # Include resolution in the plot folder name
+    # Create the Run/Boston/scene 1 folder structure
+    run_folder = os.path.join("Runs", map_short, f"scene {id} res={RESOLUTION}")
     os.makedirs(run_folder, exist_ok=True)
-    new_filename = os.path.join(run_folder, filename)
 
-    # Assign layers to the grid in parallel
-    map.assign_layer(new_filename, prnt=False)
-
-    map.save_grid(new_filename + ' data')
-    
-    # Create a folder to save the run and plots if it doesn't already exist
-    plots_folder = os.path.join(run_folder, 'plots')
+    plots_folder = os.path.join(run_folder,'plots')
     os.makedirs(plots_folder, exist_ok=True)
 
-    # Layer plot filename
-    layer_plot_filename = os.path.join(plots_folder, f"layer_plot_res={RESOLUTION}.png")
-    Visualise.show_layers(map.grid)
+    # Paths for data, plots, and subfolders
+    scene_data_path = os.path.join(run_folder, "data")
+    layer_plot_path = os.path.join(plots_folder, "layers.png")
+    risk_plots_folder = os.path.join(plots_folder, "risks")
+    pointclouds_folder = os.path.join(plots_folder, "pointclouds")
 
-    # Save the layer plot
-    plt.savefig(layer_plot_filename)
+    # Create subfolders
+    os.makedirs(risk_plots_folder, exist_ok=True)
+    os.makedirs(pointclouds_folder, exist_ok=True)
+
+    # Assign layers to the grid in parallel
+    map.assign_layer(scene_data_path, prnt=False)
+
+    map.save_grid(scene_data_path)
+
+    # Generate and save the layer plot
+    Visualise.show_layers(map.grid)
+    plt.savefig(layer_plot_path)
     plt.close()
-    print(f"Layer plot saved as '{layer_plot_filename}'.")
+    print(f"Layer plot saved as '{layer_plot_path}'.")
 
     # Initialize risk calculation
     risk = Risk()
@@ -80,54 +82,47 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
         
         # check if the tracking risk is already set, if not run the code to get the tracking risk 
         if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            obj.sample= (sample,0,0,i)
+            # obj.sample= (sample,0,0,i)
+            continue
         else:
             print('Tracking risk was already set, skipping the tracking risk calculations')
 
         #check if the detection risk is already set, if not run the code to get the detection risk 
         #if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-        dec.sample = (sample, i)
+        # dec.sample = (sample, i)
 
         print(f"sample {i} complete")
         
+        # Calculate risks
         risk.CalcRisk(map, risk_weights, i) 
         
-        # Risk plot filename
-        risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
-        #Visualise.show_risks(map.grid, i)  # Show risks for the current iteration
-
-        # Save the risk plot
+        # Save individual risk plots
+        risk_plot_filename = os.path.join(risk_plots_folder, f"risk_plot_iter_{i}.png")
+        Visualise.show_risks(map.grid, i)
         plt.savefig(risk_plot_filename)
-        plt.close()  # Close the plot to free resources for the next iteration
-
+        plt.close() 
         print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
         
+    # Plot all risk plots with global maximum values
+    max_total = max(np.max(np.array(matrix)) for matrix in [map.grid.get_total_risk_matrix(i) for i in range(map.grid.scene_length)])
+    max_static = np.max(np.array(map.grid.get_static_risk_matrix()))
+    max_detect = max(np.max(np.array(matrix)) for matrix in [map.grid.get_detect_risk_matrix(i) for i in range(map.grid.scene_length)])
+    max_track = max(np.max(np.array(matrix)) for matrix in [map.grid.get_track_risk_matrix(i) for i in range(map.grid.scene_length)])
     
-    # plot all risk plots with global maximum value 
     for i, sample in enumerate(map.samples):
-
-        # Calculate the global maximum value across all total risk matrices
-        max_total = max(np.max(np.array(matrix)) for matrix in [map.grid.get_total_risk_matrix(i) for i in range(map.grid.scene_length)])
-        max_static = np.max(np.array(map.grid.get_static_risk_matrix()))
-        max_detect = max(np.max(np.array(matrix)) for matrix in [map.grid.get_detect_risk_matrix(i) for i in range(map.grid.scene_length)])
-        max_track = max(np.max(np.array(matrix)) for matrix in [map.grid.get_track_risk_matrix(i) for i in range(map.grid.scene_length)])
-
-        risk_plot_filename = os.path.join(plots_folder, f"risk_plot_iter_{i}_res={RESOLUTION}.png")
-        Visualise.show_risks_maximised(map.grid, i, max_total, max_static, max_detect, max_track)  # Show risks for the current iteration
-
-        # Save the risk plot
+        risk_plot_filename = os.path.join(risk_plots_folder, f"risk_plot_iter_{i}.png")
+        Visualise.show_risks_maximised(map.grid, i, max_total, max_static, max_detect, max_track)  
         plt.savefig(risk_plot_filename)
-        plt.close()  # Close the plot to free resources for the next iteration
-
+        plt.close()
         print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
 
     # save the grid with the new risk values 
-    map.save_grid(new_filename + ' data')
+    map.save_grid(scene_data_path)
     print('Done')
 
 
 # This ensures that the code is only executed when the script is run directly
 if __name__ == '__main__':
     print("Running as main module...")  # Debugging line
-    for res in resolutions:
-        main(filename = 'boston scene', id=scene_id, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=res, OCC_ACCUM=OCC_ACCUM, LIDAR_DECAY=LIDAR_DECAY)
+
+    main(map_short=map_short, id=scene_id, LIDAR_RANGE=LIDAR_RANGE, RESOLUTION=RESOLUTION, OCC_ACCUM=OCC_ACCUM, LIDAR_DECAY=LIDAR_DECAY)

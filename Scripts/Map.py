@@ -214,7 +214,7 @@ class Map:
         print("Grid layers were assigned.")
 
     # This function assigns the layers variable of each cell based on the records within the map
-    def assign_layer(self, base_filename, prnt=False):
+    def assign_layer(self, filename, prnt=False):
         """
         Assigns the layers variable of each cell based on the records within the map.
         Adds the resolution value to the filename dynamically.
@@ -222,8 +222,6 @@ class Map:
         :param base_filename: The base filename without resolution value
         :param prnt: Whether to print debug information
         """
-        # Append data to the filename
-        filename = f"{base_filename} data"
 
         # Check if the file with the specific resolution exists
         if os.path.exists(filename):
