@@ -18,9 +18,9 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-#dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
+dataroot = r"C:/Users/Ruben/OneDrive/Bureaublad/data/sets/nuscenes"
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
-dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
+#dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
 LIDAR_RANGE = 50 # 50 meter
 RESOLUTION = 10 # meter
@@ -85,10 +85,8 @@ def main(filename, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
             print('Tracking risk was already set, skipping the tracking risk calculations')
 
         #check if the detection risk is already set, if not run the code to get the detection risk 
-        if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            dec.sample = (sample, i)
-        else:
-            print('Detection risk was already set, skipping the detection risk calculations')
+        #if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
+        dec.sample = (sample, i)
 
         print(f"sample {i} complete")
         
