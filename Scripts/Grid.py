@@ -72,6 +72,7 @@ class Grid:
             'grid': [[cell.to_dict() for cell in row] for row in self.grid],  # Convert all cells to dictionaries
             'has_assigned_layers': self.has_assigned_layers
         }
+    
     def circle_of_interrest(self, range, ego):
         circle_interrest = []
         for row in self.grid:

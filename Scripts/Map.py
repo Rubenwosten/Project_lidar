@@ -13,16 +13,6 @@ from nuscenes.map_expansion.map_api import NuScenesMap
 from nuscenes.map_expansion import arcline_path_utils
 from nuscenes.map_expansion.bitmap import BitMap
 
-def assign_layer_task(x, nusc_map, rec, grid, prnt=False):
-    """
-    This function processes a single row (x) of the grid and assigns layers to it.
-    """
-    row_results = []
-    for y, _ in enumerate(grid.yarray):  # Process every column in the row
-        layers = nusc_map.layers_on_point_v2(x, y, rec)
-        row_results.append((x, y, layers))  # Append (x, y, layers) for each cell in the row
-    return row_results  # Return results for the entire row
-
 
 class Map:
 
@@ -97,12 +87,6 @@ class Map:
             i += 1
         return ego_trans
         
-    def minmax(self, x, y, range):
-        x_min = np.min(x) - range
-        x_max = np.max(x) + range
-        y_min = np.min(y) - range
-        y_max = np.max(y) + range
-        return (x_min, x_max, y_min, y_max)
 
     def get_patch(self, ego, range):
         x_min = np.min(ego[:,0]) - range
@@ -111,87 +95,6 @@ class Map:
         y_max = np.max(ego[:,1]) + range
         return (x_min, x_max, y_min, y_max)
 
-    # This function changes the occurance values after each timestep
-    # returns the new occurance grid
-    def occurnence(self, occ, is_gescand, x, y, r,x_range,y_range ):
-        occur = occ
-        i = 0
-        for i in range(x_range):
-            j = 0
-            for j in range(y_range):
-                if ((i<(x-r)) or (i>(x+r)) or (j<(y-r)) or (j>(y+r))):
-                    if occur[i][j] == 1:
-                        occur[i][j]= occur[i][j] 
-                    else: occur[i][j] += 0.25
-                else:
-                    if is_gescand[i-(x-r)][j-(y-r)] == 1:
-                        occur[i][j] = 0
-                    else:
-                        if occur[i][j] == 1:
-                            occur[i][j]= occur[i][j] 
-                        else: occur[i][j] += 0.25 
-                j+=1
-            i+=1        
-        return occur
-
-
-    def gescand(self, occ, circle, x, y, r, x_range, y_range):
-        is_gescand = np.zeros((2*r+1,2*r+1))
-        i = 0
-        for i in range (x_range):
-            j = 0
-            for j in range (y_range):
-                if circle[i][j]==1:
-                    if occ[i+x-r][j+y-r]>0.5:
-                        is_gescand[i][j] = 1
-                    else:
-                        is_gescand[i][j] = 0
-                else: is_gescand[i][j] = 0
-                j += 1
-            i+=1
-        return is_gescand
-
-    # This function determines what grid cells are of interest with respect to the ego position
-    # This returns a 2d numpy array that is of size(r,r) with the grid cells in the circle having a value of 1 
-    # and the grid cells outside of the circle having a value of 0
-    def circle_of_interrest(self, r):
-        circle = np.zeros((2*r+1,2*r+1))
-        for i in range(2*r+1):
-            a = pow((i - r),2)
-            b = pow(r,2) - a
-            if b > 0:
-                y1 = round((r-np.sqrt(b)))
-                y2 = round((r+np.sqrt(b)))
-                j = 0
-                for j in range(y2-y1):
-                    circle[i][j+y1] = 1
-                    j+=1
-                i+=1
-            elif b == 0:
-                circle[i][r]= 1
-                i+= 1
-            else:
-                circle[i]=circle[i]
-                i+=1
-        return circle
-
-
-
-    def map_interrest(self, grid, x_range, y_range):
-        map_int = grid
-        i = 0
-        for i in range(x_range):
-            j = 0 
-            for j in range(y_range):
-                x = 10*i
-                y = 10*j
-                record = self.nusc_map.layers_on_point(x,y)
-                if (record['drivable_area']!= '' or record['road_block']!= '' or record['road_segment']!= '' or record['lane']!= '' or record['ped_crossing']!= '' or record['stop_line']!= '' or record['carpark_area']!= '' or record['ped_crossing']!= ''):
-                    map_int[i][j] = 1
-                else: map_int[i][j] = 0
-                j+=1
-            i+=1
-        return map_int
 
     def assign_lay(self, prnt = False):
         elements = self.grid.width * self.grid.length
@@ -235,7 +138,6 @@ class Map:
 
     # this function getsall the records within the patch of the map
     def get_records_in_patch(self, patch):
-        # my_patch = (300, 1000, 500, 1200)
         records_within_patch = self.nusc_map.get_records_in_patch(patch, self.nusc_map.non_geometric_layers, mode='intersect')
         rec = {}
         layer_names=['drivable_area', 'road_segment', 'road_block', 'lane', 'ped_crossing', 'walkway', 'stop_line', 'carpark_area']
