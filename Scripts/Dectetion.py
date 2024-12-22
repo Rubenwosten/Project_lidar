@@ -1,7 +1,7 @@
 from nuscenes.nuscenes import NuScenes 
 import numpy as np
 import os
-
+from Visualise import Visualise
 
 class Detect:
     def __init__(self, map, dataroot,reso):
@@ -35,13 +35,14 @@ class Detect:
         if self._sample != self.oud: # alleen runnen als sample veranderd
             self.lidarpoint = []
             self.file_get()
-            print ("file complete")
+            #print ("file complete")
             self.lidar_coor()
-            print("lidar complete")
+            #print("lidar complete")
             self.update_occerence()
             self.update_risk()
-            print(self.lidarpoint[1][1])
-            print(self.lidarpoint[1][0])
+            #print('self.lidarpoint[1] = ', self.lidarpoint[1])
+            #print('self.lidarpoint[1][1] = ', self.lidarpoint[1][1])
+            #print('self.lidarpoint[1][0] = ', self.lidarpoint[1][0])
             self.oud = self._sample # sample is helemaal gerund dus dit is de stopconditie
         else: return
 
@@ -69,11 +70,17 @@ class Detect:
                 if rem ==1:
                     np.frombuffer(number, dtype=np.float32)
                     y = np.frombuffer(number, dtype=np.float32)
-                    x_frame = int((x+self._x-self.patchxmin)/self.reso)
-                    y_frame = int((y+self._y-self.patchymin)/self.reso)
+                    x_frame = (x+self._x-self.patchxmin)/self.reso
+                    y_frame = (y+self._y-self.patchymin)/self.reso
+                    self.lidarpoint.append((x_frame,y_frame))
+
+                    x_frame = int(x_frame)
+                    y_frame = int(y_frame)
                     lidar_punt += 1
                     
-                    self.lidarpoint.append((x+self._x,y+self._y))
+                    x_global = x+self._x
+                    y_global = y+self._y
+
                     
                     
                     if (x_frame<0 or y_frame<0 or x_frame>= self.width or y_frame>=self.length):
@@ -84,8 +91,9 @@ class Detect:
                 else:
                     number = f.read(4) #leest de volgende bit
                 som +=1 # som houdt bij hoeveel items gelezen zijn.
-        print(lidar_punt)
-        print(som)
+        
+        #print(lidar_punt)
+        #print(som)
 
 
     def update_occerence(self):
@@ -116,6 +124,7 @@ class Detect:
                 
                 # Update the occurrence value for the current sample index in the cell
                 cell.occ[self._sampleindex] = occ
+
     def update_risk(self):
         for row in self.map.grid.grid:
             for cell in row:

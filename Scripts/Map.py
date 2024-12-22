@@ -53,8 +53,6 @@ class Map:
             print(f'ego patch = {self.get_patch(self.ego_positions, 0)}')
             print('patch = {}'.format(self.patch))
 
-        #TODO add a bit of code that checks if the grid is saved, if so load up the grid
-
         # initialise a cell grid 
         self.grid = Grid(self.patch, RES, len(self.samples))
 
@@ -197,7 +195,6 @@ class Map:
 
     def assign_lay(self, prnt = False):
         elements = self.grid.width * self.grid.length
-        time_per_element = 1 / 22.72795127375305
         print(f"Assigning layers to the grid with {elements} elements.")
 
         start_time = time.time()
@@ -210,8 +207,7 @@ class Map:
         self.has_assigned_layers = True
 
         elapsed_time = time.time() - start_time
-        print(f"Elements per second = {elements / elapsed_time:.2f}")
-        print("Grid layers were assigned.")
+        print(f"Grid layers were assigned in {elapsed_time} seconds")
 
     # This function assigns the layers variable of each cell based on the records within the map
     def assign_layer(self, filename, prnt=False):
