@@ -14,6 +14,14 @@ class Grid:
         self.length = int((y_max - y_min)/resolution)
         self.xarray = np.linspace(x_min, x_max, self.width)
         self.yarray = np.linspace(y_min, y_max, self.length)
+        self.cells_off_interest = []
+        self.total_total_risk = [0] * scene_length
+        self.total_static_risk = [0] * scene_length
+        self.total_detection_risk = [0] * scene_length
+        self.total_tracking_risk = [0] * scene_length
+        self.total_occ = [0] * scene_length
+        self.total_obj = [0] * scene_length
+        self.total_obj_sev = [0] * scene_length
         
         self.grid = [[Cell(self.xarray[x], self.yarray[y], scene_length) for y in range(self.length)] for x in range(self.width)]
 
@@ -44,6 +52,17 @@ class Grid:
 
         return layer_counts
     
+        
+    def circle_of_interrest(self, range, ego):
+        circle_interrest = []
+        for row in self.grid:
+            for cell in row:
+                x= cell.x
+                y= cell.y
+                distance = math.sqrt((y-ego[1])**2 + (x-ego[0])**2)
+                if distance < range:
+                    circle_interrest.append(cell)
+    
     def get_layer_matrix(self):
         return [[cell.layer for cell in row] for row in self.grid]
     
@@ -72,16 +91,6 @@ class Grid:
             'grid': [[cell.to_dict() for cell in row] for row in self.grid],  # Convert all cells to dictionaries
             'has_assigned_layers': self.has_assigned_layers
         }
-    
-    def circle_of_interrest(self, range, ego):
-        circle_interrest = []
-        for row in self.grid:
-            for cell in row:
-                x= cell.x
-                y= cell.y
-                distance = math.sqrt((y-ego[1])**2 + (x-ego[0])**2)
-                if distance < range:
-                    circle_interrest.append(cell)
 
 
     @staticmethod

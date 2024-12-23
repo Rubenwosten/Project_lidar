@@ -26,25 +26,34 @@ class Detect:
     def sample(self): #getter om sample aftelezen
         return self._sample
     
-    @sample.setter
-    def sample(self, values): #values is een tuple van sample ego_x en ego_y
-        self._sample, self._sampleindex = values
+    #@sample.setter
+    #def sample(self, values): #values is een tuple van sample ego_x en ego_y
+        
+
+    def update(self, sample, sample_index, prnt=False):
+        self._sample = sample
+        self._sampleindex = sample_index
         self._x = self.ego[self._sampleindex][0]
         self._y = self.ego[self._sampleindex][1]
         
         if self._sample != self.oud: # alleen runnen als sample veranderd
             self.lidarpoint = []
             self.file_get()
-            #print ("file complete")
+            if prnt:
+                print ("file complete")
             self.lidar_coor()
-            #print("lidar complete")
+            if prnt:
+                print("lidar complete")
             self.update_occerence()
             self.update_risk()
-            #print('self.lidarpoint[1] = ', self.lidarpoint[1])
-            #print('self.lidarpoint[1][1] = ', self.lidarpoint[1][1])
-            #print('self.lidarpoint[1][0] = ', self.lidarpoint[1][0])
+            if prnt:
+                print('self.lidarpoint[1] = ', self.lidarpoint[1])
+                print('self.lidarpoint[1][1] = ', self.lidarpoint[1][1])
+                print('self.lidarpoint[1][0] = ', self.lidarpoint[1][0])
             self.oud = self._sample # sample is helemaal gerund dus dit is de stopconditie
-        else: return
+            return
+        else: 
+            return
 
 
     def file_get(self): #Deze functie zoekt het bestand van de lidar pointcloud die bij de sample hoort. Vervolgens wordt het volledige pad er naar toe gemaakt.

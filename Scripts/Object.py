@@ -58,13 +58,21 @@ class Object:
     def sample(self):
         return self._sample
     
-    @sample.setter
-    def sample(self, values):
-        self._sample,self._x, self._y, self._sampleindex = values
+    #@sample.setter
+    #def sample(self, values):
+        
+
+    def update(self, sample, x, y, sample_index, prnt=False):
+        self._sample = sample
+        self._x = x
+        self._y = y
+        self._sampleindex = sample_index
         if self._sample != self.oud:
             info = self.nusc.get('sample', self._sample)
             anns = info['anns']
-            print(f'amount of object within the sample = {len(anns)}')
+            if prnt:
+                print(f'amount of object within the sample = {len(anns)}')
+            
             for i in tqdm(range(len(anns))):
                 ans = anns[i]
                 info = self.nusc.get('sample_annotation', ans)
@@ -79,13 +87,15 @@ class Object:
                     for j in range(num_of_modes):
                             box = self.bounding_box(info['size'], rot, int(gespl[2*j][0] + info['translation'][0]), int(gespl[2*j+1][0]+ info['translation'][1]))
                             self.risk_to_cell(box, prob, j, sev)
-                            #print("1 num of modes klaar")
-                            #print (box)
+                            if prnt:
+                                print("1 num of modes klaar")
+                                print (box)
                             continue
                     continue
             self.oud = self._sample
-        else: return
-
+            return
+        else: 
+             return
 
     def voorspelling(self,objecttoken):
         img = self.mtp_input_representation.make_input_representation(objecttoken,self._sample)

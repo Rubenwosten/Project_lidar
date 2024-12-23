@@ -24,20 +24,21 @@ from nuscenes.map_expansion.bitmap import BitMap
 #dataroot = r"C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes"
 dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
 
-LIDAR_RANGE = 100 # 100 meter
-OCC_ACCUM = 1 / 8 # full accumulation in 8 samples = 4 sec 
-LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
-
-risk_weights = (0.5, 2, 10)
-
 map_name = 'boston-seaport'  #'singapore-onenorth'
 map_short = 'Boston'
 
 map_width = 2979.5
 map_height = 2118.1
 
+
+LIDAR_RANGE = 100 # 100 meter
+OCC_ACCUM = 1 / 8 # full accumulation in 8 samples = 4 sec 
+LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
+
+risk_weights = (0.5, 2, 10)
+
 scene_id = 1
-RESOLUTION = 10 # meter
+RESOLUTION = 1 # meter
 
 def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
@@ -93,9 +94,12 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
         #else:
         #    print('Tracking risk was already set, skipping the tracking risk calculations')
 
+        obj.update(sample=sample,x=0,y=0,sample_index=i, prnt=False)
+
         #check if the detection risk is already set, if not run the code to get the detection risk 
         #if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-        dec.sample = (sample, i)
+        
+        dec.update(sample=sample, sample_index=i, prnt=False)
 
         # Save individual pointcloud plots
         Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_folder, overlay=False)
