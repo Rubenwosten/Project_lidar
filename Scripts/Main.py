@@ -38,7 +38,7 @@ LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
 risk_weights = (0.5, 2, 10)
 
 scene_id = 1
-RESOLUTION = 1 # meter
+RESOLUTION = 2 # meter
 
 def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
@@ -62,11 +62,13 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
     risk_plots_folder = os.path.join(plots_folder, "risks")
     pointclouds_folder = os.path.join(plots_folder, "pointclouds")
     pointclouds_overlay_folder = os.path.join(plots_folder, "pointclouds overlay")
+    occ_folder = os.path.join(plots_folder, "occurrence")
     
     # Create subfolders
     os.makedirs(risk_plots_folder, exist_ok=True)
     os.makedirs(pointclouds_folder, exist_ok=True)
     os.makedirs(pointclouds_overlay_folder, exist_ok=True)
+    os.makedirs(occ_folder, exist_ok=True)
 
     # Assign layers to the grid in parallel
     map.assign_layer(scene_data_path, prnt=False)
@@ -74,10 +76,7 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
     map.save_grid(scene_data_path)
 
     # Generate and save the layer plot
-    Visualise.show_layers(map.grid)
-    plt.savefig(layer_plot_path)
-    plt.close()
-    print(f"Layer plot saved as '{layer_plot_path}'.\n")
+    Visualise.plot_layers(map.grid, layer_plot_path)
 
     # Initialize risk calculation
     risk = Risk()
@@ -86,58 +85,51 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
     # Calculate risk for each sample
     for i, sample in enumerate(map.samples):
-        # do the object tracking risk and object detection risk by setting the sample
-        
-        # check if the tracking risk is already set, if not run the code to get the tracking risk 
-        #if (sum(cell.track_risk[i] for row in map.grid.grid for cell in row ) == 0):
-            # obj.sample= (sample,0,0,i)
-        #else:
-        #    print('Tracking risk was already set, skipping the tracking risk calculations')
+        break
+        #TODO add a check if it has already been set
+        # map.grid.total_obj[i], map.grid.total_obj_sev[i] = obj.update(sample=sample,x=0,y=0,sample_index=i, prnt=False)
 
-        obj.update(sample=sample,x=0,y=0,sample_index=i, prnt=False)
-
-        #check if the detection risk is already set, if not run the code to get the detection risk 
-        #if (sum(cell.detect_risk[i] for row in map.grid.grid for cell in row ) == 0):
-        
+        #TODO add a check if it has already been set
         dec.update(sample=sample, sample_index=i, prnt=False)
 
         # Save individual pointcloud plots
-        Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_folder, overlay=False)
-        Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_overlay_folder, overlay=True)
+        # Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_folder, overlay=False)
+        # Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_overlay_folder, overlay=True)
 
-        
         # Calculate risks
-        risk.CalcRisk(map, risk_weights, i) 
+        risk.CalcRisk(map, risk_weights, i)
+
+        # update total variables
+        map.update(sample=sample,i=i, weights=risk_weights)
         
         # Save individual risk plots
-        risk_plot_filename = os.path.join(risk_plots_folder, f"risk_plot_iter_{i}.png")
-        Visualise.show_risks(map.grid, i)
-        plt.savefig(risk_plot_filename)
-        plt.close() 
-        print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
+        # Visualise.plot_risks(map.grid, i, risk_plots_folder)
         print(f"sample {i} complete\n")
 
+    # save the grid with the new risk values 
+    map.save_grid(scene_data_path)
+
+    Visualise.plot_total_risks(map.grid, plots_folder)
+    Visualise.plot_total_var(map.grid.total_occ, 'Total Occurrence', plots_folder)
+    Visualise.plot_total_var(map.grid.total_obj, 'Total Objects', plots_folder)
+    Visualise.plot_total_var(map.grid.total_obj_sev, 'Total Object severity', plots_folder)
         
     # Plot all risk plots with global maximum values
     max_total = max(np.max(np.array(matrix)) for matrix in [map.grid.get_total_risk_matrix(i) for i in range(map.grid.scene_length)])
     max_static = np.max(np.array(map.grid.get_static_risk_matrix()))
     max_detect = max(np.max(np.array(matrix)) for matrix in [map.grid.get_detect_risk_matrix(i) for i in range(map.grid.scene_length)])
     max_track = max(np.max(np.array(matrix)) for matrix in [map.grid.get_track_risk_matrix(i) for i in range(map.grid.scene_length)])
-    
-    for i, sample in enumerate(map.samples):
-        risk_plot_filename = os.path.join(risk_plots_folder, f"risk_plot_iter_{i}.png")
-        Visualise.show_risks_maximised(map.grid, i, max_total, max_static, max_detect, max_track)  
-        plt.savefig(risk_plot_filename)
-        plt.close()
-        print(f"Risk plot for iteration {i} saved as '{risk_plot_filename}'.")
+    maxs = (max_total, max_static, max_detect, max_track)
 
-    # save the grid with the new risk values 
-    map.save_grid(scene_data_path)
+    for i, sample in enumerate(map.samples):
+        # Visualise.plot_risks_maximised(map.grid, i, maxs, risk_plots_folder)
+        Visualise.plot_occ(map.grid, i, occ_folder)    
 
     # create gifs of all results
     Visualise.create_gif_from_folder(risk_plots_folder, os.path.join(gif_folder,'risks.gif'))
     Visualise.create_gif_from_folder(pointclouds_folder, os.path.join(gif_folder,'pointcloud.gif'))
     Visualise.create_gif_from_folder(pointclouds_overlay_folder, os.path.join(gif_folder,'pointcloud_layers.gif'))
+    Visualise.create_gif_from_folder(occ_folder, os.path.join(gif_folder,'occurrence.gif'))
 
     print('Done')
 

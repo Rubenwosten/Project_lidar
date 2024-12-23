@@ -56,13 +56,23 @@ class Grid:
 
         return layer_counts
     
-    def calc_total_vars(self, range, ego):
+    def calc_total_vars(self, range, ego, i, weights):
         self.cells_off_interest = self.circle_of_interrest(range, ego)
 
         for cell in self.cells_off_interest:
-            self.total_total_risk[i] += cell.total_risk
+            # cell variables
+            self.total_static_risk[i] += cell.static_risk
+            self.total_detection_risk[i] += cell.detect_risk[i]
+            self.total_tracking_risk[i] += cell.track_risk[i]
+            self.total_occ[i] += cell.occ[i]
 
-        return
+        w_static, w_detect, w_track = weights
+        self.total_static_risk[i] *= w_static
+        self.total_detection_risk[i] *= w_detect
+        self.total_tracking_risk[i] *= w_track
+
+        self.total_total_risk[i] = self.total_static_risk[i] + self.total_detection_risk[i] + self.total_tracking_risk[i]
+        
         
     def circle_of_interrest(self, range, ego):
         circle_interrest = []
@@ -89,11 +99,15 @@ class Grid:
     
     def get_track_risk_matrix(self, i):
         return [[cell.track_risk[i] for cell in row] for row in self.grid]
+    
+    def get_occ_matrix(self, i):
+        return [[cell.occ[i] for cell in row] for row in self.grid]
 
     def to_dict(self):
         """
         Convert the Grid object into a dictionary format for saving.
         """
+        
         return {
             'patch': self.patch,
             'resolution': self.res,
@@ -101,7 +115,14 @@ class Grid:
             'width': self.width,
             'length': self.length,
             'grid': [[cell.to_dict() for cell in row] for row in self.grid],  # Convert all cells to dictionaries
-            'has_assigned_layers': self.has_assigned_layers
+            'has_assigned_layers': self.has_assigned_layers,
+            'total total risk': self.total_total_risk,
+            'total static risk': self.total_static_risk,
+            'total detection risk': self.total_detection_risk,
+            'total tracking risk': self.total_tracking_risk,
+            'total occ': self.total_occ,
+            'total obj': self.total_obj,
+            'total obj sev': self.total_obj_sev
         }
 
 
@@ -126,7 +147,14 @@ class Grid:
             [Cell.from_dict(cell_dict, scene_length) for cell_dict in row]
             for row in grid_dict['grid']
         ]
-
+        grid.total_total_risk = grid_dict['total total risk']
+        grid.total_static_risk = grid_dict['total static risk']
+        grid.total_detection_risk = grid_dict['total detection risk']
+        grid.total_tracking_risk = grid_dict['total tracking risk']
+        grid.total_occ = grid_dict['total occ']
+        grid.total_obj = grid_dict['total obj']
+        grid.total_obj_sev = grid_dict['total obj sev']
+        
         return grid
 
         

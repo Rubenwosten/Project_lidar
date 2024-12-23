@@ -68,18 +68,20 @@ class Object:
         self._x = x
         self._y = y
         self._sampleindex = sample_index
+        total_sev = 0
         if self._sample != self.oud:
             info = self.nusc.get('sample', self._sample)
             anns = info['anns']
             if prnt:
                 print(f'amount of object within the sample = {len(anns)}')
             
-            for i in tqdm(range(len(anns))):
+            for i in tqdm(range(len(anns)), desc='Tracking Objects'):
                 ans = anns[i]
                 info = self.nusc.get('sample_annotation', ans)
                 rot = np.arctan2((2*(info['rotation'][0]*info['rotation'][3]+info['rotation'][1]*info['rotation'][2])),(1-2*(info['rotation'][3]**2+info['rotation'][2]**2)))
                 voor = self.voorspelling(info['instance_token'])
                 sev = severity.factor(info['category_name'], info['rotation'], info['translation'], self.nusc.ego_pose[i]['rotation'], self._x, self._y, detected=True)
+                total_sev += sev
                 gespl , prob = self.route_splitser(num_of_modes,lengte, voor)
                 j=0
                 if np.isnan(gespl).any():
@@ -94,9 +96,9 @@ class Object:
                             continue
                     continue
             self.oud = self._sample
-            return
+            return len(anns), total_sev
         else: 
-             return
+             return len(anns), total_sev
 
     def voorspelling(self,objecttoken):
         img = self.mtp_input_representation.make_input_representation(objecttoken,self._sample)

@@ -1,88 +1,85 @@
-from Visualise import Visualise
-from Map import Map
-from Risk import Risk
-import os
+# This is the file that executes all the code
+
 import matplotlib.pyplot as plt
-from Severity import severity
-import pickle
+from tqdm import tqdm
+import time
+from datetime import timedelta
+import numpy as np
+import re
+import Cell
+import os
+from Grid import Grid 
+from Map import Map
+from Visualise import Visualise
+from Risk import Risk
+from Object import Object
+from Dectetion import Detect
 
+from nuscenes.nuscenes import NuScenes
+from nuscenes.map_expansion.map_api import NuScenesMap
+from nuscenes.map_expansion import arcline_path_utils
+from nuscenes.map_expansion.bitmap import BitMap
 
-LIDAR_RANGE = 50 # 50 meter
-RESOLUTION = 10 # meter
 
 #dataroot = r'C:/Users/marni/OneDrive/Documents/BEP 2024/data/sets/nuscenes'
 dataroot = r'C:/Users/Chris/Python scripts/BEP VALDERS/data/sets/nuscenes'
-map_name = 'boston-seaport' #'singapore-onenorth'
+
+map_name = 'boston-seaport'  #'singapore-onenorth'
+map_short = 'Boston'
 
 map_width = 2979.5
 map_height = 2118.1
 
-x = 600 # ego_position[0][0]
-y = 1600 # ego_position[0][1]
-ego = (x, y)
+
+LIDAR_RANGE = 100 # 100 meter
+OCC_ACCUM = 1 / 8 # full accumulation in 8 samples = 4 sec 
+LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
+
+risk_weights = (0.5, 2, 10)
 
 scene_id = 1
+RESOLUTION = 10 # meter
 
-map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
+map = Map(dataroot, map_name, map_width, map_height, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY)
 
-scene_ids = [1]
-resolutions = [1]
-''' 
-def add_lidar_aantal_to_saved_grid(filename):
-    """
-    Add a new field 'lidar_aantal' to each cell in a saved grid dictionary.
-    The new field is an empty list of size 'scene_length'.
-    """
-    
-    # Load the saved grid dictionary
-    with open(filename, 'rb') as infile:
-        grid_dict = pickle.load(infile)
-    
-    # Extract the scene length from the grid dictionary
-    scene_length = grid_dict['scene length']
-    
-    # Add the 'lidar_aantal' field to each cell in the grid
-    for row in grid_dict['grid']:
-        for cell_dict in row:
-            cell_dict['lidar_aantal'] = [0] * scene_length  # Initialize as an empty list of size scene_length
-    
-    # Save the updated grid dictionary
-    with open(filename, 'wb') as outfile:
-        pickle.dump(grid_dict, outfile)
+# Create a folder to save the run and plots if it doesn't already exist
+# Create the Run/Boston/scene 1 folder structure
+run_folder = os.path.join("Runs", map_short, f"scene {id} res={RESOLUTION}")
+os.makedirs(run_folder, exist_ok=True)
 
-    print(f"Updated grid with 'lidar_aantal' saved to {filename}")
-'''
-for scene_id in scene_ids:
-    for res in resolutions:
-        filepath = os.path.join(f'run boston scene {scene_id} res = {res}', f'boston scene {scene_id} res = {res} data')
-        if os.path.exists(filepath):
-            map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, res)
+plots_folder = os.path.join(run_folder,'plots')
+os.makedirs(plots_folder, exist_ok=True)
 
-            map.load_grid(filepath) 
+gif_folder = os.path.join(run_folder,'GIFs')
+os.makedirs(gif_folder, exist_ok=True)
 
-            
-        else:
-            print(f'filepath {filepath} does not exist...')
+# Paths for data, plots, and subfolders
+scene_data_path = os.path.join(run_folder, "data")
+layer_plot_path = os.path.join(plots_folder, "layers.png")
+risk_plots_folder = os.path.join(plots_folder, "risks")
+pointclouds_folder = os.path.join(plots_folder, "pointclouds")
+pointclouds_overlay_folder = os.path.join(plots_folder, "pointclouds overlay")
 
+# Create subfolders
+os.makedirs(risk_plots_folder, exist_ok=True)
+os.makedirs(pointclouds_folder, exist_ok=True)
+os.makedirs(pointclouds_overlay_folder, exist_ok=True)
 
-map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, 1)
-filepath = os.path.join(f'run boston scene {1} res = {1}', f'boston scene {1} res = {1} data')
-map.grid = map.load_grid(filepath)
+# Assign layers to the grid in parallel
+map.assign_layer(scene_data_path, prnt=False)
 
+# Generate and save the layer plot
+Visualise.show_layers(map.grid)
+plt.savefig(layer_plot_path)
+plt.close()
+print(f"Layer plot saved as '{layer_plot_path}'.\n")
 
-filepaths = f'run boston scene {scene_id} res = {res}'
+# create gifs of all results
+Visualise.create_gif_from_folder(risk_plots_folder, os.path.join(gif_folder,'risks.gif'))
+Visualise.create_gif_from_folder(pointclouds_folder, os.path.join(gif_folder,'pointcloud.gif'))
+Visualise.create_gif_from_folder(pointclouds_overlay_folder, os.path.join(gif_folder,'pointcloud_layers.gif'))
 
-for filepath in filepaths:
-    map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION)
-    map.grid = map.load_grid(filepath)
-    print(map.grid.grid[0][0].occ)
-   
-res = 1
-scene_id = 2
-map.load_grid(os.path.join(f'run boston scene {scene_id} res = {res}',f'boston scene {scene_id} res = {res} data'))
-
-print(map.grid.count_layers()) 
-
+print('Done')
 
 
 

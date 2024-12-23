@@ -51,8 +51,9 @@ class Map:
         # get all records within your map
         self.rec = self.get_records_in_patch(self.patch)
 
-    def update(self, sample, i):
-        self.grid.calc_total_vars(range=self.range, ego=self.ego_positions[i])
+    def update(self, sample, i, weights):
+        self.grid.calc_total_vars(range=self.range, ego=self.ego_positions[i], i=i, weights=weights)
+        # Add a visualise total plots statement?
 
     def get_scene(self, index):
         #sample array
@@ -105,7 +106,7 @@ class Map:
         print(f"Assigning layers to the grid with {elements} elements.")
 
         start_time = time.time()
-        for i, x in enumerate(tqdm(self.grid.xarray)):
+        for i, x in enumerate(tqdm(self.grid.xarray), desc='Assigning Layers'):
             if prnt:
                 print(f"Assigning for i = {i} and x = {x} at time = {time.time() - start_time:.2f}")
             for j, y in enumerate(self.grid.yarray):

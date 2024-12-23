@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgba
-from matplotlib.patches import Patch, Rectangle
-from matplotlib.colors import Normalize
+from matplotlib.patches import Patch, Rectangle, Circle
+from matplotlib.colors import Normalize, ListedColormap
 from matplotlib.cm import ScalarMappable
 from matplotlib.colorbar import ColorbarBase
 from matplotlib.gridspec import GridSpec
@@ -59,10 +59,76 @@ class Visualise:
         ax.set_title("Layer Grid")
         ax.legend(handles=legend_handles, loc='upper right')
 
+        plt.title('Layer plot')
         plt.tight_layout()
         #plt.show()
 
         print('Layer grid visualization complete.')
+
+    @staticmethod
+    def plot_layers(grid, path):
+        Visualise.show_layers(grid)
+        plt.savefig(path)
+        plt.close()
+        print(f"Layer plot saved as '{path}'.\n")
+
+    @staticmethod
+    def show_occ(grid, i):
+        """
+        Visualizes the grid's occurrence matrix.
+
+        Displays the grid's occurrence data, plotting cells with the 'empty' layer as white 
+        and others based on their occurrence value.
+        """
+
+        # Get the occurrence matrix for the given iteration
+        occ_matrix = np.transpose(grid.get_occ_matrix(i))
+        layer_matrix = np.transpose(grid.get_layer_matrix())
+
+        # Create a mask for 'empty' cells
+        mask = (layer_matrix == 'empty')
+
+        # Prepare a colormap for occurrence values (excluding 'empty' cells)
+        cmap = plt.cm.viridis
+        norm = Normalize(vmin=0, vmax=1)  # Normalize occurrence values between 0 and 1
+
+        # Create the plot
+        plt.figure(figsize=(10, 8))
+
+        # Plot the occurrence matrix, masking 'empty' cells
+        im = plt.imshow(
+            np.ma.masked_where(mask, occ_matrix), 
+            origin='lower', 
+            cmap=cmap, 
+            norm=norm
+        )
+
+        # Overlay 'empty' cells as white
+        plt.imshow(
+            np.where(mask, 1, np.nan),  # Masked cells get 1, others are NaN
+            origin='lower', 
+            cmap=ListedColormap(['white']), 
+            interpolation='none'
+        )
+
+        # Add colorbar for the occurrence values
+        cbar = plt.colorbar(im)
+        cbar.set_label('Occurrence Value')
+
+        # Add title and adjust layout
+        plt.title(f"Occurrence at iteration {i}")
+        plt.tight_layout()
+        # plt.show()
+
+        # print('Occurrence visualization complete.')
+    
+    @staticmethod
+    def plot_occ(grid, i, output_folder):
+        occ_plot_filename = os.path.join(output_folder, f"occ_plot_iter_{i}.png")
+        Visualise.show_occ(grid, i)
+        plt.savefig(occ_plot_filename)
+        plt.close() 
+        print(f"Risk plot for iteration {i} saved as '{occ_plot_filename}'.")
 
     @staticmethod
     def show_risks(grid, index):
@@ -102,11 +168,20 @@ class Visualise:
             cbar = fig.colorbar(ScalarMappable(norm=im.norm, cmap=im.cmap), ax=ax, shrink=0.8)
             cbar.set_label(title)
 
-        # Adjust layout to avoid overlap
+        # Add the custom title to the entire figure
+        fig.suptitle(f"Risk plots Iteration {index}", fontsize=16)
         plt.tight_layout(pad=5.0)  # Increase padding between subplots for better spacing
         #plt.show()
 
         #print('Risk grid visualization complete.')
+
+    @staticmethod
+    def plot_risks(grid, index, output_folder):
+        risk_plot_filename = os.path.join(output_folder, f"risk_plot_iter_{index}.png")
+        Visualise.show_risks(grid, index)
+        plt.savefig(risk_plot_filename)
+        plt.close() 
+        print(f"Risk plot for iteration {index} saved as '{risk_plot_filename}'.")
     
     @staticmethod
     def show_risks_maximised(grid, index, max_total, max_static, max_detect, max_track):
@@ -147,11 +222,22 @@ class Visualise:
             cbar = fig.colorbar(ScalarMappable(norm=im.norm, cmap=im.cmap), ax=ax, shrink=0.8)
             cbar.set_label(title)
 
+        # Add the custom title to the entire figure
+        fig.suptitle(f"Risk plots Iteration {index}", fontsize=16)
         # Adjust layout to avoid overlap
         plt.tight_layout(pad=5.0)  # Increase padding between subplots for better spacing
         #plt.show()
 
         #print('Risk grid visualization complete.')
+
+    @staticmethod
+    def plot_risks_maximised(grid, index, maxs, output_folder):
+        max_total, max_static, max_detect, max_track = maxs
+        risk_plot_filename = os.path.join(output_folder, f"risk_plot_iter_{index}.png")
+        Visualise.show_risks_maximised(grid, index, max_total, max_static, max_detect, max_track)  
+        plt.savefig(risk_plot_filename)
+        plt.close()
+        print(f"Risk plot for iteration {index} saved as '{risk_plot_filename}'.")
 
     @staticmethod
     def plot_grid(grid, index, prnt=False):
@@ -268,6 +354,11 @@ class Visualise:
         # Plot the red box at the ego position
         ego_x, ego_y, _ = ego_pos
         ego_x, ego_y = (ego_x-x_min)/grid.res, (ego_y-y_min)/grid.res
+
+        # Add a circle overlay
+        circle = Circle((ego_x, ego_y), map.range / grid.res, linewidth=2, edgecolor='blue', facecolor='none')
+        plt.gca().add_patch(circle)
+
         ego_box_size = 0.5  # Define the size of the red box (adjust as needed) In amount of cells covered (currently its a 5x5m box)
         red_box = Rectangle(
             (ego_x - ego_box_size / 2, ego_y - ego_box_size / 2),  # Bottom-left corner
@@ -296,6 +387,7 @@ class Visualise:
 
         print(f"Point cloud scatter plot for iteration {iteration} saved as '{plot_filename}'.")
 
+    @staticmethod
     def create_gif_from_folder(image_folder, output_gif_path, duration=500):
         """
         Creates and saves a GIF from a folder of images.
@@ -306,7 +398,10 @@ class Visualise:
         - duration: int, the duration for each frame in the GIF in milliseconds (default is 500ms).
         """
         # List all image files in the folder, sorted by file name (for correct ordering)
-        image_files = sorted([f for f in os.listdir(image_folder) if f.endswith('.png')])
+        image_files = [f for f in os.listdir(image_folder) if f.endswith('.png')]
+
+        # Sort files numerically by extracting the numeric part from filenames
+        image_files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
 
         # Load all the images into a list
         images = []
@@ -325,3 +420,50 @@ class Visualise:
         )
 
         print(f"GIF saved as {output_gif_path}")
+
+    @staticmethod
+    def plot_total_risks(grid, output_folder):
+        plt.figure(figsize=(10, 6))
+    
+        # Plot each risk
+        plt.plot(grid.total_total_risk, label="Total Total Risk", marker='+')
+        plt.plot(grid.total_static_risk, label="Total Static Risk", marker='o')
+        plt.plot(grid.total_detection_risk, label="Total Detection Risk", marker='x')
+        plt.plot(grid.total_tracking_risk, label="Total Tracking Risk", marker='s')
+        
+        # Add title and labels
+        plt.title("Total Risks Overview")
+        plt.xlabel("Index")
+        plt.ylabel("Risk Value")
+        
+        # Add legend
+        plt.legend()
+        
+        # Show grid for better readability
+        plt.grid(True)
+        
+        # Save the plot
+        plot_filename = os.path.join(output_folder, "total risks.png")
+        plt.savefig(plot_filename)
+        plt.close()
+        print(f"total risks plot saved as '{plot_filename}'.")
+
+    @staticmethod
+    def plot_total_var(var, title, output_folder):
+        plt.figure(figsize=(10, 6))
+    
+        # Plot each risk
+        plt.plot(var)
+        
+        # Add title and labels
+        plt.title(title)
+        plt.xlabel("Index")
+        
+        # Show grid for better readability
+        plt.grid(True)
+        
+        # Save the plot
+        plot_filename = os.path.join(output_folder, f"{title}.png")
+        plt.savefig(plot_filename)
+        plt.close()
+        print(f"{title} plot saved as '{plot_filename}'.")

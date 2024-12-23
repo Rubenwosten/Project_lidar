@@ -51,7 +51,7 @@ class severity:
             "score": 1.021333333,
             "orientation": 0
         },
-        "movable_object.pushable_pul": {
+        "movable_object.pushable_pullable": {
             "score": 1.051,
             "orientation": 0
         },
