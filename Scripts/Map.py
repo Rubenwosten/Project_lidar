@@ -17,6 +17,8 @@ from nuscenes.map_expansion.bitmap import BitMap
 class Map:
 
     def __init__(self, dataroot, map_name, map_width, map_height, scene_id, RANGE, RES, OCC_ACCUM, LIDAR_DECAY, prnt=False) -> None:
+        self.dataroot = dataroot
+        self.range = RANGE
         # get the correct nuscenes object
         self.nusc = NuScenes(version='v1.0-mini', dataroot=dataroot, verbose=False)
 
@@ -49,6 +51,8 @@ class Map:
         # get all records within your map
         self.rec = self.get_records_in_patch(self.patch)
 
+    def update(self, sample, i):
+        self.grid.calc_total_vars(range=self.range, ego=self.ego_positions[i])
 
     def get_scene(self, index):
         #sample array

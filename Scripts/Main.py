@@ -81,8 +81,8 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
     # Initialize risk calculation
     risk = Risk()
-    obj = Object(RESOLUTION,map, dataroot, map_name)
-    dec = Detect(map, dataroot, RESOLUTION)
+    obj = Object(map)
+    dec = Detect(map)
 
     # Calculate risk for each sample
     for i, sample in enumerate(map.samples):

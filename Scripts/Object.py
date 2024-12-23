@@ -29,7 +29,7 @@ lengte = 24
 
 
 class Object:
-    def __init__(self,reso, map, dataroot, map_name):
+    def __init__(self, map):
         #data object
         self._sample = None
         self._sampleindex = None
@@ -43,7 +43,7 @@ class Object:
         self.length = self.map.grid.length
 
         #nusc function
-        self.reso=reso
+        self.reso= map.grid.res
         self.nusc = map.nusc
         self.nusc_map = map.nusc_map
         self.helper = helper = PredictHelper(self.nusc)
@@ -63,6 +63,7 @@ class Object:
         
 
     def update(self, sample, x, y, sample_index, prnt=False):
+        # add a check whether the tracking risk has already been set
         self._sample = sample
         self._x = x
         self._y = y

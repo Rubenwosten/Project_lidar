@@ -6,6 +6,7 @@ import math
 class Grid:
 
     def __init__(self, patch, resolution, scene_length, prnt=False):
+        # grid vars
         self.patch = patch 
         x_min, x_max , y_min, y_max = patch
         self.res = resolution
@@ -14,6 +15,8 @@ class Grid:
         self.length = int((y_max - y_min)/resolution)
         self.xarray = np.linspace(x_min, x_max, self.width)
         self.yarray = np.linspace(y_min, y_max, self.length)
+
+        # Total vars
         self.cells_off_interest = []
         self.total_total_risk = [0] * scene_length
         self.total_static_risk = [0] * scene_length
@@ -23,6 +26,7 @@ class Grid:
         self.total_obj = [0] * scene_length
         self.total_obj_sev = [0] * scene_length
         
+        # grid instatiation
         self.grid = [[Cell(self.xarray[x], self.yarray[y], scene_length) for y in range(self.length)] for x in range(self.width)]
 
         self.has_assigned_layers = False
@@ -52,6 +56,13 @@ class Grid:
 
         return layer_counts
     
+    def calc_total_vars(self, range, ego):
+        self.cells_off_interest = self.circle_of_interrest(range, ego)
+
+        for cell in self.cells_off_interest:
+            self.total_total_risk[i] += cell.total_risk
+
+        return
         
     def circle_of_interrest(self, range, ego):
         circle_interrest = []
@@ -62,6 +73,7 @@ class Grid:
                 distance = math.sqrt((y-ego[1])**2 + (x-ego[0])**2)
                 if distance < range:
                     circle_interrest.append(cell)
+        return circle_interrest
     
     def get_layer_matrix(self):
         return [[cell.layer for cell in row] for row in self.grid]

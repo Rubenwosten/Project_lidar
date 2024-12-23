@@ -4,20 +4,20 @@ import os
 from Visualise import Visualise
 
 class Detect:
-    def __init__(self, map, dataroot,reso):
+    def __init__(self, map):
         self._sample=None
         self._x = None
         self._y = None
         self.patchxmin = map.patch[0]
         self.patchymin = map.patch[2]
         self.oud = None
-        self.dataroot = dataroot
+        self.dataroot = map.dataroot
         self.nusc = map.nusc
         self.file = None
         self.map = map
         self._sampleindex = None
         self.ego = self.map.ego_positions
-        self.reso = reso
+        self.reso = map.grid.res
         self.lidarpoint = []
         self.width = self.map.grid.width
         self.length = self.map.grid.length
