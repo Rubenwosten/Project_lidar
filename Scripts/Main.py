@@ -40,6 +40,8 @@ risk_weights = (0.5, 2, 10)
 scene_id = 1
 RESOLUTION = 2 # meter
 
+visualise_pointcloud = False
+
 def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
     print("Starting main function...")
@@ -85,7 +87,6 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
     # Calculate risk for each sample
     for i, sample in enumerate(map.samples):
-        break
         #TODO add a check if it has already been set
         # map.grid.total_obj[i], map.grid.total_obj_sev[i] = obj.update(sample=sample,x=0,y=0,sample_index=i, prnt=False)
 
@@ -93,8 +94,9 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
         dec.update(sample=sample, sample_index=i, prnt=False)
 
         # Save individual pointcloud plots
-        # Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_folder, overlay=False)
-        # Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_overlay_folder, overlay=True)
+        if visualise_pointcloud:
+            Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_folder, overlay=False)
+            Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_overlay_folder, overlay=True)
 
         # Calculate risks
         risk.CalcRisk(map, risk_weights, i)
@@ -115,14 +117,9 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
     Visualise.plot_total_var(map.grid.total_obj_sev, 'Total Object severity', plots_folder)
         
     # Plot all risk plots with global maximum values
-    max_total = max(np.max(np.array(matrix)) for matrix in [map.grid.get_total_risk_matrix(i) for i in range(map.grid.scene_length)])
-    max_static = np.max(np.array(map.grid.get_static_risk_matrix()))
-    max_detect = max(np.max(np.array(matrix)) for matrix in [map.grid.get_detect_risk_matrix(i) for i in range(map.grid.scene_length)])
-    max_track = max(np.max(np.array(matrix)) for matrix in [map.grid.get_track_risk_matrix(i) for i in range(map.grid.scene_length)])
-    maxs = (max_total, max_static, max_detect, max_track)
-
+    maxs = get_global_max()
     for i, sample in enumerate(map.samples):
-        # Visualise.plot_risks_maximised(map.grid, i, maxs, risk_plots_folder)
+        Visualise.plot_risks_maximised(map.grid, i, maxs, risk_plots_folder)
         Visualise.plot_occ(map.grid, i, occ_folder)    
 
     # create gifs of all results
@@ -142,3 +139,10 @@ if __name__ == '__main__':
 
     run_time = time.time() - start_time
     print(f'\nRunning took {timedelta(seconds=run_time)}')
+
+def get_global_max():
+    max_total = max(np.max(np.array(matrix)) for matrix in [map.grid.get_total_risk_matrix(i) for i in range(map.grid.scene_length)])
+    max_static = np.max(np.array(map.grid.get_static_risk_matrix()))
+    max_detect = max(np.max(np.array(matrix)) for matrix in [map.grid.get_detect_risk_matrix(i) for i in range(map.grid.scene_length)])
+    max_track = max(np.max(np.array(matrix)) for matrix in [map.grid.get_track_risk_matrix(i) for i in range(map.grid.scene_length)])
+    return (max_total, max_static, max_detect, max_track)
