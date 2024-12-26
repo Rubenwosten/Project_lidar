@@ -106,7 +106,7 @@ class Map:
         print(f"Assigning layers to the grid with {elements} elements.")
 
         start_time = time.time()
-        for i, x in enumerate(tqdm(self.grid.xarray), desc='Assigning Layers'):
+        for i, x in enumerate(tqdm(self.grid.xarray, desc='Assigning Layers')):
             if prnt:
                 print(f"Assigning for i = {i} and x = {x} at time = {time.time() - start_time:.2f}")
             for j, y in enumerate(self.grid.yarray):

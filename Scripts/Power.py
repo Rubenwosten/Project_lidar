@@ -37,13 +37,14 @@ class power:
     @property
     def sample(self): #getter om sample aftelezen
         return self._sample
+    
     @sample.setter
     def sample(self, values):
         self._sample, self._sampleindex = values
         cones = self.assign_cell_to_cone()
         for cone in enumerate(cones):
             for cell in cone:
-                
+                break
 
 
 

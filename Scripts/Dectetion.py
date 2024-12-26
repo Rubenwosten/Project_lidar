@@ -19,6 +19,7 @@ class Detect:
         self.ego = self.map.ego_positions
         self.reso = map.grid.res
         self.lidarpoint = []
+        self.lidarpointV2 = []
         self.width = self.map.grid.width
         self.length = self.map.grid.length
 
@@ -38,6 +39,7 @@ class Detect:
         
         if self._sample != self.oud: # alleen runnen als sample veranderd
             self.lidarpoint = []
+            self.lidarpointV2 = []
             self.file_get()
             if prnt:
                 print ("file complete")
@@ -62,47 +64,57 @@ class Detect:
         self.file = os.path.join(self.dataroot, info_2['filename'])
         
 
-    def lidar_coor(self):#Deze functie Loopt door het bestand heen. Het bestand heeft per Lidar punt een x, y, z coordinaten en de channel index + reflectifity
-
+    def lidar_coor(self):
+        # Deze functie Loopt door het bestand heen. Het bestand heeft per Lidar punt een x, y, z coordinaten en de channel index + reflectifity
         som = 0
-        lidar_punt=0
-        
+        lidar_punt = 0
+
         with open(self.file, "rb") as f:
             number = f.read(4)
-            
+
             while number != b"":
-                quo, rem = divmod(som,5) #omdat je alleen x en y wilt gebruiken en niet de andere dingen kijk je naar het residu van het item waar die op zit.
-                if rem == 0: # als het residu = 0 heb je het x coordinaat en res = 1 is het y-coordinaat
-                    
-                    x = np.frombuffer(number, dtype=np.float32)
-                    number = f.read(4) #leest de volgende bit    
-                if rem ==1:
-                    np.frombuffer(number, dtype=np.float32)
-                    y = np.frombuffer(number, dtype=np.float32)
-                    x_frame = (x+self._x-self.patchxmin)/self.reso
-                    y_frame = (y+self._y-self.patchymin)/self.reso
-                    self.lidarpoint.append((x_frame,y_frame))
+                quo, rem = divmod(som, 5)  # omdat je alleen x, y, z wilt gebruiken kijk je naar het residu van het item waar die op zit.
+
+                if rem == 0:  # residu = 0 -> x-coordinaat
+                    x = np.frombuffer(number, dtype=np.float32)[0]
+                    number = f.read(4)  # leest de volgende bit
+                elif rem == 1:  # residu = 1 -> y-coordinaat
+                    y = np.frombuffer(number, dtype=np.float32)[0]
+                    number = f.read(4)  # leest de volgende bit
+                elif rem == 2:  # residu = 2 -> z-coordinaat
+                    z = np.frombuffer(number, dtype=np.float32)[0]
+                    self.lidarpointV2.append((x, y, z))
+
+                    x_frame = (x + self._x - self.patchxmin) / self.reso
+                    y_frame = (y + self._y - self.patchymin) / self.reso
+                    self.lidarpoint.append((x_frame, y_frame))
 
                     x_frame = int(x_frame)
                     y_frame = int(y_frame)
                     lidar_punt += 1
-                    
-                    x_global = x+self._x
-                    y_global = y+self._y
 
-                    
-                    
-                    if (x_frame<0 or y_frame<0 or x_frame>= self.width or y_frame>=self.length):
-                        number = f.read(4) #leest de volgende bit
-                    else: 
-                        self.map.grid.get_cell(x_frame,y_frame).lidar_aantal[self._sampleindex] +=1
-                        number = f.read(4) #leest de volgende bit
+                    x_global = x + self._x
+                    y_global = y + self._y
+
+                    if (
+                        x_frame < 0
+                        or y_frame < 0
+                        or x_frame >= self.width
+                        or y_frame >= self.length
+                    ):
+                        number = f.read(4)  # leest de volgende bit
+                    else:
+                        self.map.grid.get_cell(x_frame, y_frame).lidar_aantal[
+                            self._sampleindex
+                        ] += 1
+                        number = f.read(4)  # leest de volgende bit
                 else:
-                    number = f.read(4) #leest de volgende bit
-                som +=1 # som houdt bij hoeveel items gelezen zijn.
-        
-        #print(lidar_punt)
-        #print(som)
+                    number = f.read(4)  # leest de volgende bit
+
+                som += 1  # som houdt bij hoeveel items gelezen zijn.
+
+        # print(lidar_punt)
+        # print(som)
 
 
     def update_occerence(self):

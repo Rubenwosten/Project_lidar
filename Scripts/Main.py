@@ -33,14 +33,13 @@ map_height = 2118.1
 
 LIDAR_RANGE = 100 # 100 meter
 OCC_ACCUM = 1 / 8 # full accumulation in 8 samples = 4 sec 
-LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
+LIDAR_DECAY = 0.3 # amount of occurrence that goes down per lidar point
 
-risk_weights = (0.5, 2, 10)
+risk_weights = (0.5, 2, 10)# (0.5, 2, 10) # static, detection, tracking
 
-scene_id = 1
+scene_id = 4
 RESOLUTION = 2 # meter
-
-visualise_pointcloud = False
+visualise_pointcloud = True
 
 def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
@@ -88,11 +87,12 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
     # Calculate risk for each sample
     for i, sample in enumerate(map.samples):
         #TODO add a check if it has already been set
-        # map.grid.total_obj[i], map.grid.total_obj_sev[i] = obj.update(sample=sample,x=0,y=0,sample_index=i, prnt=False)
+        #map.grid.total_obj[i], map.grid.total_obj_sev[i] = obj.update(sample=sample,x=0,y=0,sample_index=i, prnt=False)
 
         #TODO add a check if it has already been set
         dec.update(sample=sample, sample_index=i, prnt=False)
-
+        # if i == 10:
+            # Visualise.show_lidar_pointcloud(map, dec.lidarpointV2, i)
         # Save individual pointcloud plots
         if visualise_pointcloud:
             Visualise.save_pointcloud_scatterplot(map, dec.lidarpoint, i, pointclouds_folder, overlay=False)
@@ -107,7 +107,7 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
         # Save individual risk plots
         # Visualise.plot_risks(map.grid, i, risk_plots_folder)
         print(f"sample {i} complete\n")
-
+    
     # save the grid with the new risk values 
     map.save_grid(scene_data_path)
 
@@ -117,7 +117,7 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
     Visualise.plot_total_var(map.grid.total_obj_sev, 'Total Object severity', plots_folder)
         
     # Plot all risk plots with global maximum values
-    maxs = get_global_max()
+    maxs = get_global_max(map=map)
     for i, sample in enumerate(map.samples):
         Visualise.plot_risks_maximised(map.grid, i, maxs, risk_plots_folder)
         Visualise.plot_occ(map.grid, i, occ_folder)    
@@ -130,6 +130,12 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
 
     print('Done')
 
+def get_global_max(map):
+    max_total = max(np.max(np.array(matrix)) for matrix in [map.grid.get_total_risk_matrix(i) for i in range(map.grid.scene_length)])
+    max_static = np.max(np.array(map.grid.get_static_risk_matrix()))
+    max_detect = max(np.max(np.array(matrix)) for matrix in [map.grid.get_detect_risk_matrix(i) for i in range(map.grid.scene_length)])
+    max_track = max(np.max(np.array(matrix)) for matrix in [map.grid.get_track_risk_matrix(i) for i in range(map.grid.scene_length)])
+    return (max_total, max_static, max_detect, max_track)
 
 # This ensures that the code is only executed when the script is run directly
 if __name__ == '__main__':
@@ -140,9 +146,4 @@ if __name__ == '__main__':
     run_time = time.time() - start_time
     print(f'\nRunning took {timedelta(seconds=run_time)}')
 
-def get_global_max():
-    max_total = max(np.max(np.array(matrix)) for matrix in [map.grid.get_total_risk_matrix(i) for i in range(map.grid.scene_length)])
-    max_static = np.max(np.array(map.grid.get_static_risk_matrix()))
-    max_detect = max(np.max(np.array(matrix)) for matrix in [map.grid.get_detect_risk_matrix(i) for i in range(map.grid.scene_length)])
-    max_track = max(np.max(np.array(matrix)) for matrix in [map.grid.get_track_risk_matrix(i) for i in range(map.grid.scene_length)])
-    return (max_total, max_static, max_detect, max_track)
+

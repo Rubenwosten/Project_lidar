@@ -5,6 +5,7 @@ from matplotlib.colors import Normalize, ListedColormap
 from matplotlib.cm import ScalarMappable
 from matplotlib.colorbar import ColorbarBase
 from matplotlib.gridspec import GridSpec
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import os
 from PIL import Image
@@ -386,6 +387,45 @@ class Visualise:
         plt.close()
 
         print(f"Point cloud scatter plot for iteration {iteration} saved as '{plot_filename}'.")
+
+    @staticmethod
+    def show_lidar_pointcloud(map, pointcloud, i):
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection='3d')
+
+        # Extract X, Y, Z coordinates from the point cloud
+        x_coords = [point[0] for point in pointcloud]
+        y_coords = [point[1] for point in pointcloud]
+        z_coords = [point[2] for point in pointcloud]
+
+        # Scatter plot of the 3D point cloud
+        ax.scatter(x_coords, y_coords, z_coords, c='black', s=1, marker='.')
+
+        '''
+        # Plot the red box at the ego position
+        ego_pos = map.ego_positions[i]
+        ego_x, ego_y, ego_z = ego_pos
+
+        ego_box_size = 0.5  # Define the size of the red box (adjust as needed) in meters
+        red_box = Rectangle(
+            (ego_x - ego_box_size / 2, ego_y - ego_box_size / 2),  # Bottom-left corner
+            ego_box_size, ego_box_size,  # Width and height
+            linewidth=2, edgecolor='red', facecolor='none'
+        )
+        ax.add_patch(red_box)  # Add the red box to the plot
+        '''
+
+        # Setting the labels and title
+        ax.set_title(f"3D Point Cloud Iteration {i}")
+        ax.set_xlabel("X (Global Coordinates)")
+        ax.set_ylabel("Y (Global Coordinates)")
+        ax.set_zlabel("Z (Global Coordinates)")
+
+        lim = 50
+        ax.set_xlim(-lim,lim)
+        ax.set_ylim(-lim,lim)
+        plt.show()
 
     @staticmethod
     def create_gif_from_folder(image_folder, output_gif_path, duration=500):
