@@ -38,13 +38,13 @@ LIDAR_DECAY = 0.1 # amount of occurrence that goes down per lidar point
 risk_weights = (0.5, 2, 10)
 
 scene_id = 1
-RESOLUTION = 10 # meter
+RESOLUTION = 0.5 # meter
 
-map = Map(dataroot, map_name, map_width, map_height, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY)
+map = Map(dataroot, map_name, map_width, map_height, scene_id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY)
 
 # Create a folder to save the run and plots if it doesn't already exist
 # Create the Run/Boston/scene 1 folder structure
-run_folder = os.path.join("Runs", map_short, f"scene {id} res={RESOLUTION}")
+run_folder = os.path.join("Runs", map_short, f"scene {scene_id} res={RESOLUTION}")
 os.makedirs(run_folder, exist_ok=True)
 
 plots_folder = os.path.join(run_folder,'plots')
