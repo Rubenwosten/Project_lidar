@@ -128,6 +128,10 @@ def main(map_short, id, LIDAR_RANGE, RESOLUTION, OCC_ACCUM, LIDAR_DECAY):
     Visualise.create_gif_from_folder(pointclouds_overlay_folder, os.path.join(gif_folder,'pointcloud_layers.gif'))
     Visualise.create_gif_from_folder(occ_folder, os.path.join(gif_folder,'occurrence.gif'))
 
+    # check scene data size, if more than 100MB give a warning message to add it to the gitignore
+    data_size = os.path.getsize(scene_data_path)
+    if (data_size > 100000000):
+        print(f'DATA FILE {scene_data_path} \nIS TOO BIG FOR GITHUB: ADD IT TO THE GITIGNORE FILE')
     print('Done')
 
 def get_global_max(map):
