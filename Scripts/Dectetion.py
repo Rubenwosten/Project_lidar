@@ -43,7 +43,14 @@ class Detect:
             self.file_get()
             if prnt:
                 print ("file complete")
-            self.lidar_coor()
+            info = self.nusc.get('sample', self._sample)
+            info = self.nusc.get('sample_data', info['data']['LIDAR_TOP'])
+            info_2 = self.nusc.get('ego_pose', info['ego_pose_token'])
+            rot = np.arctan2((2*(info_2['rotation'][0]*info_2['rotation'][3]+info_2['rotation'][1]*info_2['rotation'][2])),(1-2*(info_2['rotation'][3]**2+info_2['rotation'][2]**2)))
+            if prnt:
+                print (rot)
+            rot_matrix = np.array([[np.cos(rot), np.sin(rot)], [-np.sin(rot), np.cos(rot)]])
+            self.lidar_coor(rot_matrix)
             if prnt:
                 print("lidar complete")
             self.update_occerence()
@@ -64,7 +71,7 @@ class Detect:
         self.file = os.path.join(self.dataroot, info_2['filename'])
         
 
-    def lidar_coor(self):
+    def lidar_coor(self, rot_matrix):
         # Deze functie Loopt door het bestand heen. Het bestand heeft per Lidar punt een x, y, z coordinaten en de channel index + reflectifity
         som = 0
         lidar_punt = 0
@@ -85,9 +92,11 @@ class Detect:
                     z = np.frombuffer(number, dtype=np.float32)[0]
                     self.lidarpointV2.append((x, y, z))
 
-                    x_frame = (x + self._x - self.patchxmin) / self.reso
-                    y_frame = (y + self._y - self.patchymin) / self.reso
-                    self.lidarpoint.append((x_frame, y_frame))
+                    xy= np.array([x,y])
+                    xy_rotated = np.dot(rot_matrix, xy)
+                    x_frame = (xy_rotated[0]+self._x-self.patchxmin)/self.reso
+                    y_frame = (xy_rotated[1]+self._y-self.patchymin)/self.reso
+                    self.lidarpoint.append((x_frame,y_frame))
 
                     x_frame = int(x_frame)
                     y_frame = int(y_frame)
